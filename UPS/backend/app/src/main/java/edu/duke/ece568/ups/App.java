@@ -3,12 +3,29 @@
  */
 package edu.duke.ece568.ups;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import java.io.IOException;
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+import edu.duke.ece568.ups.WorldUps.UConnect;
+import edu.duke.ece568.ups.WorldUps.UConnected;
+import edu.duke.ece568.ups.WorldUps.UInitTruck;
+
+public class App {
+
+    public static void main(String[] args) throws IOException {
+      ClientConnection worldConnection = new ClientConnection("localhost", 12345);
+      UInitTruck.Builder truck1 = UInitTruck.newBuilder();
+        truck1.setId(1);
+        truck1.setX(1);
+        truck1.setY(1);
+
+        UConnect.Builder connect =  UConnect.newBuilder();
+        connect.setIsAmazon(false);
+        connect.addTrucks(truck1);
+
+        MessageTransmitter.sendMsgTo(connect.build(), worldConnection.getOutputStream());
+        UConnected.Builder resp = UConnected.newBuilder();
+        MessageTransmitter.recvMsgFrom(resp, worldConnection.getInputStream());
+        System.out.println("world id: " + resp.getWorldid());
+        System.out.println("result: " + resp.getResult());
     }
 }
