@@ -5,27 +5,67 @@ package edu.duke.ece568.ups;
 
 import java.io.IOException;
 
+import edu.duke.ece568.ups.WorldAmazon.AConnect;
+import edu.duke.ece568.ups.WorldAmazon.AConnected;
+import edu.duke.ece568.ups.WorldAmazon.AInitWarehouse;
+import edu.duke.ece568.ups.WorldUps.UCommands;
 import edu.duke.ece568.ups.WorldUps.UConnect;
 import edu.duke.ece568.ups.WorldUps.UConnected;
+import edu.duke.ece568.ups.WorldUps.UGoPickup;
 import edu.duke.ece568.ups.WorldUps.UInitTruck;
+import edu.duke.ece568.ups.WorldUps.UResponses;
 
 public class App {
 
-    public static void main(String[] args) throws IOException {
-      ClientConnection worldConnection = new ClientConnection("localhost", 12345);
-      UInitTruck.Builder truck1 = UInitTruck.newBuilder();
-        truck1.setId(1);
-        truck1.setX(1);
-        truck1.setY(1);
+  public static void main(String[] args) throws IOException {
 
-        UConnect.Builder connect =  UConnect.newBuilder();
-        connect.setIsAmazon(false);
-        connect.addTrucks(truck1);
+    ClientConnection worldConnection = new ClientConnection("vcm-24690.vm.duke.edu", 12345);
+    UInitTruck.Builder truck1 = UInitTruck.newBuilder();
+    truck1.setId(1);
+    truck1.setX(1);
+    truck1.setY(1);
 
-        MessageTransmitter.sendMsgTo(connect.build(), worldConnection.getOutputStream());
-        UConnected.Builder resp = UConnected.newBuilder();
-        MessageTransmitter.recvMsgFrom(resp, worldConnection.getInputStream());
-        System.out.println("world id: " + resp.getWorldid());
-        System.out.println("result: " + resp.getResult());
-    }
+    UConnect.Builder connect = UConnect.newBuilder();
+    connect.setIsAmazon(false);
+    connect.addTrucks(truck1);
+
+    MessageTransmitter.sendMsgTo(connect.build(), worldConnection.getOutputStream());
+    UConnected.Builder resp = UConnected.newBuilder();
+    MessageTransmitter.recvMsgFrom(resp, worldConnection.getInputStream());
+    System.out.println("world id: " + resp.getWorldid());
+    System.out.println("result: " + resp.getResult());
+
+    ClientConnection WAConnection = new ClientConnection("vcm-24690.vm.duke.edu", 6666);
+    AInitWarehouse.Builder warehouse1 = AInitWarehouse.newBuilder();
+    warehouse1.setId(1);
+    warehouse1.setX(5);
+    warehouse1.setY(5);
+
+    AConnect.Builder Aconnect = AConnect.newBuilder();
+    Aconnect.setWorldid(resp.getWorldid());
+    Aconnect.addInitwh(warehouse1);
+    Aconnect.setIsAmazon(true);
+
+    MessageTransmitter.sendMsgTo(Aconnect.build(), WAConnection.getOutputStream());
+    AConnected.Builder aconnected = AConnected.newBuilder();
+    MessageTransmitter.recvMsgFrom(aconnected, WAConnection.getInputStream());
+    System.out.println("worldID: "+ aconnected.getWorldid());
+    System.out.println("result: " + aconnected.getResult());
+    /*
+    UGoPickup.Builder goPickup = UGoPickup.newBuilder();
+    goPickup.setTruckid(1);
+    goPickup.setWhid(1);
+    goPickup.setSeqnum(1);
+
+    UCommands.Builder uCommand = UCommands.newBuilder();
+    uCommand.addPickups(goPickup);
+
+    UResponses.Builder uResp = UResponses.newBuilder();
+     MessageTransmitter.sendMsgTo(uCommand.build(), worldConnection.getOutputStream());
+     MessageTransmitter.recvMsgFrom(uResp, worldConnection.getInputStream());
+     System.out.println(uResp.getAcksCount());
+     UCommands.Builder ack = UCommands.newBuilder();
+     ack.addAcks(uResp.getAcks(0));
+    */
+  }
 }
