@@ -18,7 +18,7 @@ public class MessageTransmitter {
    * @param <T> generic type of the data
    * @return send result
    */
-  public static <T extends GeneratedMessageV3> boolean sendMsgTo(T msg, OutputStream out) {
+  public static synchronized <T extends GeneratedMessageV3> boolean sendMsgTo(T msg, OutputStream out) {
     try {
       byte[] data = msg.toByteArray();
       CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(out);
@@ -42,7 +42,7 @@ public class MessageTransmitter {
    * @param <T>      generic type of the response
    * @return true receive successful
    */
-  public static <T extends GeneratedMessageV3.Builder<?>> boolean recvMsgFrom(T response, InputStream in) {
+  public static synchronized <T extends GeneratedMessageV3.Builder<?>> boolean recvMsgFrom(T response, InputStream in) {
     try {
       CodedInputStream codedInputStream = CodedInputStream.newInstance(in);
       int len = codedInputStream.readRawVarint32();
