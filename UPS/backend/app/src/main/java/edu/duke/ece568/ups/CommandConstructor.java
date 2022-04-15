@@ -9,7 +9,7 @@ import edu.duke.ece568.ups.WorldUps.UGoDeliver;
 import edu.duke.ece568.ups.WorldUps.UGoPickup;
 
 public class CommandConstructor {
-  
+  /*
   public static Command constructUGoPickup(OutputStream out, int truckid,int whid, long seqnum){
     UGoPickup.Builder goPickup = UGoPickup.newBuilder();
     goPickup.setTruckid(truckid);
@@ -33,5 +33,5 @@ public class CommandConstructor {
     UCommands.Builder uCommand = UCommands.newBuilder();
     uCommand.addDeliveries(goDeliver);
     return new Command(out,uCommand.build(),seqnum);
-  }
+  }*/
 }
