@@ -14,6 +14,7 @@ public class Pickup implements Action{
     private OutputStream out;
     private int truckid, whid;
     private long seqnum;
+    private UGoPickup.Builder pickup;
 
     public Pickup(OutputStream out, int truckid,int whid, long seqnum){
         this.out = out;
@@ -25,6 +26,7 @@ public class Pickup implements Action{
         goPickup.setTruckid(truckid);
         goPickup.setWhid(whid);
         goPickup.setSeqnum(seqnum);
+        pickup = goPickup;
     
         UCommands.Builder uCommand = UCommands.newBuilder();
         uCommand.addPickups(goPickup);
@@ -45,6 +47,10 @@ public class Pickup implements Action{
 
     public void setAck(long ackNo) throws IOException{
         cmd.setAck(ackNo);
+    }
+
+    public void append(UCommands.Builder ucommand){
+        ucommand.addPickups(pickup);
     }
     
 }

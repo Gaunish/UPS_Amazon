@@ -21,8 +21,11 @@ import edu.duke.ece568.ups.WorldUps.UResponses;
 public class App {
 
   public static void main(String[] args) throws IOException,InterruptedException {
+    Database database = new Database(); 
+    database.connectDB();
+
     BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
-    ClientConnection worldConnection = new ClientConnection("localhost", 12345);
+    ClientConnection worldConnection = new ClientConnection("vcm-25935.vm.duke.edu", 12345);
     UWReceiver listener = new UWReceiver(queue, worldConnection.getInputStream());
     Thread t = new Thread(listener);
     
@@ -44,7 +47,7 @@ public class App {
     System.out.println("world id: " + resp.getWorldid());
     System.out.println("result: " + resp.getResult());
     
-    ClientConnection WAConnection = new ClientConnection("localhost", 23456);
+    ClientConnection WAConnection = new ClientConnection("vcm-25935.vm.duke.edu", 23456);
     AInitWarehouse.Builder warehouse1 = AInitWarehouse.newBuilder();
     warehouse1.setId(1);
     warehouse1.setX(5);
