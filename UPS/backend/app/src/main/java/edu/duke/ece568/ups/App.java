@@ -18,28 +18,11 @@ import edu.duke.ece568.ups.WorldUps.UGoPickup;
 import edu.duke.ece568.ups.WorldUps.UInitTruck;
 import edu.duke.ece568.ups.WorldUps.UResponses;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.ResultSet;
-
-
-
 public class App {
 
   public static void main(String[] args) throws IOException,InterruptedException {
-    try {
-      Class.forName("org.postgresql.Driver");
-     q Connection c = DriverManager.getConnection("jdbc:postgresl://db:5432/postgres?sslmode=disable","postgres", "1234");
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.err.println(e.getClass().getName()+": "+e.getMessage());
-      return;
-      //System.exit(0);
-    }
-    System.out.println("Opened database successfully");
-
+    Database database = new Database(); 
+    database.connectDB();
 
     BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
     ClientConnection worldConnection = new ClientConnection("vcm-25935.vm.duke.edu", 12345);
