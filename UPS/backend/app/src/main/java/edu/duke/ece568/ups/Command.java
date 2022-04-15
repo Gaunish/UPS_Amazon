@@ -2,8 +2,11 @@ package edu.duke.ece568.ups;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.google.protobuf.GeneratedMessageV3;
+
 import edu.duke.ece568.ups.WorldUps.UCommands;
 
 public class Command{
@@ -21,10 +24,16 @@ public class Command{
       }
     
       public void sendMessage() throws IOException{
-        if(!MessageTransmitter.sendMsgTo(message, out)){
-          throw new IOException("Error when sending message to the world");
-        }
-        timeofSending = System.currentTimeMillis();
+        Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                  if(isAcked){
+                    timer.cancel();
+                  }
+                    MessageTransmitter.sendMsgTo(message, out);
+                }
+              }, 0, 5000);//5s timeout
       }
     
       public boolean isTimeout(){
