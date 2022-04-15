@@ -15,6 +15,7 @@ public class Deliver implements Action{
     private int truckid;
     private ArrayList<UDeliveryLocation> loc;
     private long seqnum;
+    UGoDeliver.Builder deliver;
 
     public Deliver(OutputStream out, int truckid, ArrayList<UDeliveryLocation> locations, long seqnum){
         this.out = out;
@@ -28,6 +29,7 @@ public class Deliver implements Action{
         for(int i=0;i<locations.size();i++){
           goDeliver.addPackages(locations.get(i));
         }
+        deliver = goDeliver;
     
         UCommands.Builder uCommand = UCommands.newBuilder();
         uCommand.addDeliveries(goDeliver);
@@ -48,5 +50,9 @@ public class Deliver implements Action{
 
     public void setAck(long ackNo) throws IOException{
         cmd.setAck(ackNo);
+    }
+
+    public void append(UCommands.Builder ucommand){
+        ucommand.addDeliveries(deliver);
     }
 }
