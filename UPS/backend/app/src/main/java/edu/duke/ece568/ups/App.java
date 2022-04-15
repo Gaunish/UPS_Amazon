@@ -20,10 +20,10 @@ import edu.duke.ece568.ups.WorldUps.UResponses;
 
 public class App {
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException,InterruptedException {
     BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
     ClientConnection worldConnection = new ClientConnection("localhost", 12345);
-    Receiver listener = new Receiver(queue, worldConnection.getInputStream());
+    UWReceiver listener = new UWReceiver(queue, worldConnection.getInputStream());
     Thread t = new Thread(listener);
     
     
