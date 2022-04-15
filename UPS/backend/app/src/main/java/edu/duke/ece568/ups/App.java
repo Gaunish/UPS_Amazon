@@ -4,6 +4,8 @@
 package edu.duke.ece568.ups;
 
 import java.io.IOException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import edu.duke.ece568.ups.WorldAmazon.AConnect;
 import edu.duke.ece568.ups.WorldAmazon.AConnected;
@@ -11,6 +13,7 @@ import edu.duke.ece568.ups.WorldAmazon.AInitWarehouse;
 import edu.duke.ece568.ups.WorldUps.UCommands;
 import edu.duke.ece568.ups.WorldUps.UConnect;
 import edu.duke.ece568.ups.WorldUps.UConnected;
+import edu.duke.ece568.ups.WorldUps.UFinished;
 import edu.duke.ece568.ups.WorldUps.UGoPickup;
 import edu.duke.ece568.ups.WorldUps.UInitTruck;
 import edu.duke.ece568.ups.WorldUps.UResponses;
@@ -18,8 +21,12 @@ import edu.duke.ece568.ups.WorldUps.UResponses;
 public class App {
 
   public static void main(String[] args) throws IOException {
-
-    ClientConnection worldConnection = new ClientConnection("vcm-24690.vm.duke.edu", 12345);
+    BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
+    ClientConnection worldConnection = new ClientConnection("localhost", 12345);
+    Receiver listener = new Receiver(queue, worldConnection.getInputStream());
+    Thread t = new Thread(listener);
+    
+    
     UInitTruck.Builder truck1 = UInitTruck.newBuilder();
     truck1.setId(1);
     truck1.setX(1);
@@ -30,12 +37,14 @@ public class App {
     connect.addTrucks(truck1);
 
     MessageTransmitter.sendMsgTo(connect.build(), worldConnection.getOutputStream());
+
+    
     UConnected.Builder resp = UConnected.newBuilder();
     MessageTransmitter.recvMsgFrom(resp, worldConnection.getInputStream());
     System.out.println("world id: " + resp.getWorldid());
     System.out.println("result: " + resp.getResult());
-
-    ClientConnection WAConnection = new ClientConnection("vcm-24690.vm.duke.edu", 6666);
+    
+    ClientConnection WAConnection = new ClientConnection("localhost", 23456);
     AInitWarehouse.Builder warehouse1 = AInitWarehouse.newBuilder();
     warehouse1.setId(1);
     warehouse1.setX(5);
@@ -51,17 +60,32 @@ public class App {
     MessageTransmitter.recvMsgFrom(aconnected, WAConnection.getInputStream());
     System.out.println("worldID: "+ aconnected.getWorldid());
     System.out.println("result: " + aconnected.getResult());
-    /*
+    
     UGoPickup.Builder goPickup = UGoPickup.newBuilder();
     goPickup.setTruckid(1);
     goPickup.setWhid(1);
     goPickup.setSeqnum(1);
 
+    t.start();
     UCommands.Builder uCommand = UCommands.newBuilder();
     uCommand.addPickups(goPickup);
-
+    MessageTransmitter.sendMsgTo(uCommand.build(), worldConnection.getOutputStream());
+    while(true){
+      UResponses.Builder Uresp;
+      while((Uresp = queue.poll()) != null){
+        if(Uresp.getCompletionsCount()>0){
+          UFinished.Builder finished = Uresp.getCompletionsBuilder(0);
+          System.out.println("Truck id is: "+finished.getTruckid());
+          System.out.println("Status is: "+finished.getStatus());
+        }
+        for(int i =0; i<Uresp.getAcksCount();i++){
+        System.out.println("Ack is : "+ Uresp.getAcks(i));
+        }
+      }
+    }
+    
+    /*
     UResponses.Builder uResp = UResponses.newBuilder();
-     MessageTransmitter.sendMsgTo(uCommand.build(), worldConnection.getOutputStream());
      MessageTransmitter.recvMsgFrom(uResp, worldConnection.getInputStream());
      System.out.println(uResp.getAcksCount());
      UCommands.Builder ack = UCommands.newBuilder();
