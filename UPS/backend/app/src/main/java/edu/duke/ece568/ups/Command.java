@@ -13,7 +13,7 @@ public class Command{
     OutputStream out;
     GeneratedMessageV3 message;
     long timeofSending;
-    boolean isAcked;
+    public boolean isAcked;
     long seqNo;
     
     public <T extends GeneratedMessageV3> Command(OutputStream out, T msg, long seqNo){
@@ -31,9 +31,12 @@ public class Command{
                   if(isAcked){
                     timer.cancel();
                   }
+                  else{
+                  System.out.println("Sqenum "+seqNo+": Sending Message to world");
                     MessageTransmitter.sendMsgTo(message, out);
+                  }
                 }
-              }, 0, 5000);//5s timeout
+              }, 0, 5000);//1s timeout
       }
     
       public boolean isTimeout(){

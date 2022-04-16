@@ -16,7 +16,7 @@ public class Pickup implements Action{
     private long seqnum;
     private UGoPickup.Builder pickup;
 
-    public Pickup(OutputStream out, int truckid,int whid, long seqnum){
+  public Pickup(OutputStream out, int truckid,int whid, long seqnum){
         this.out = out;
         this.truckid = truckid;
         this.whid = whid;
@@ -33,6 +33,7 @@ public class Pickup implements Action{
         
         cmd = new Command(out,uCommand.build(),seqnum);
     }
+  
 
     public void sendMessage() throws IOException{
         cmd.sendMessage();
@@ -41,12 +42,12 @@ public class Pickup implements Action{
         return cmd.isTimeout();
     }
 
-    public void checkAck() throws IOException{
-        cmd.checkAck();
+    public boolean checkAck() throws IOException{
+      return cmd.isAcked;
     }
 
-    public void setAck(long ackNo) throws IOException{
-        cmd.setAck(ackNo);
+    public void setAck() throws IOException{
+      cmd.isAcked = true;
     }
 
     public void append(UCommands.Builder ucommand){

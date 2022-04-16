@@ -45,12 +45,12 @@ public class Query implements Action{
         return cmd.isTimeout();
     }
 
-    public void checkAck() throws IOException{
-        cmd.checkAck();
+    public boolean checkAck() throws IOException{
+      return cmd.isAcked;
     }
 
-    public void setAck(long ackNo) throws IOException{
-        cmd.setAck(ackNo);
+    public void setAck() throws IOException{
+      cmd.isAcked = true;
     }
     
     public void append(UCommands.Builder ucommand){

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -16,8 +18,6 @@ import edu.duke.ece568.ups.WorldAmazon.AInitWarehouse;
 import edu.duke.ece568.ups.WorldUps.UCommands;
 import edu.duke.ece568.ups.WorldUps.UConnect;
 import edu.duke.ece568.ups.WorldUps.UConnected;
-import edu.duke.ece568.ups.WorldUps.UFinished;
-import edu.duke.ece568.ups.WorldUps.UGoPickup;
 import edu.duke.ece568.ups.WorldUps.UInitTruck;
 import edu.duke.ece568.ups.WorldUps.UResponses;
 
@@ -30,15 +30,17 @@ public class App {
     MessageTransmitter.sendMsgTo(uCommand.build(), out);
   }
 
-  public static long initWorld(InputStream in,OutputStream out) {
+  public static long initWorld(Database db,InputStream in,OutputStream out) {
 
     UConnect.Builder connect = UConnect.newBuilder();
     connect.setIsAmazon(false);
+    String sql = "";
     for (int i = 0; i < 100; i++) {
       UInitTruck.Builder truck = UInitTruck.newBuilder();
       truck.setId(i);
       truck.setX(1);
       truck.setY(1);
+      sql+= "INSERT INTO TRUCK VALUES("+i+",1,1,'idle');";
       connect.addTrucks(truck);
     }
     MessageTransmitter.sendMsgTo(connect.build(), out);
@@ -46,13 +48,17 @@ public class App {
     MessageTransmitter.recvMsgFrom(resp,in);
     System.out.println("world id: " + resp.getWorldid());
     System.out.println("result: " + resp.getResult());
+    db.executeStatement(sql, "Error");
     return resp.getWorldid();
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
     long worldid;
+    long seqnum = 1;
+    HashMap<Long,Action>actionLists = new HashMap<Long,Action>();
+    HashSet<Long> receivedseq = new HashSet<Long>();
     BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
-    ClientConnection worldConnection = new ClientConnection("localhost", 12345);
+    ClientConnection worldConnection = new ClientConnection("172.18.0.1", 12345);
     UWReceiver listener = new UWReceiver(queue, worldConnection.getInputStream());
     Thread t = new Thread(listener);
 
@@ -61,46 +67,57 @@ public class App {
     database.connectDB();
 
     //init for ups side - initialize 100 trucks and create a new world
-    worldid = initWorld(worldConnection.getInputStream(),worldConnection.getOutputStream());
+    worldid = initWorld(database, worldConnection.getInputStream(),worldConnection.getOutputStream());
 
-    ClientConnection WAConnection = new ClientConnection("localhost", 23456);
-    AInitWarehouse.Builder warehouse1 = AInitWarehouse.newBuilder();
-    warehouse1.setId(1);
-    warehouse1.setX(5);
-    warehouse1.setY(5);
-
+    //Mock Amazon
+    ClientConnection WAConnection = new ClientConnection("172.18.0.1", 23456);
     AConnect.Builder Aconnect = AConnect.newBuilder();
     Aconnect.setWorldid(worldid);
-    Aconnect.addInitwh(warehouse1);
     Aconnect.setIsAmazon(true);
+    for(int i=1;i<5;i++){
+    AInitWarehouse.Builder warehouse1 = AInitWarehouse.newBuilder();
+    warehouse1.setId(i);
+    warehouse1.setX(5+i);
+    warehouse1.setY(5+i);  
+    
+    Aconnect.addInitwh(warehouse1);
+    }
 
     MessageTransmitter.sendMsgTo(Aconnect.build(), WAConnection.getOutputStream());
     AConnected.Builder aconnected = AConnected.newBuilder();
     MessageTransmitter.recvMsgFrom(aconnected, WAConnection.getInputStream());
     System.out.println("worldID: " + aconnected.getWorldid());
     System.out.println("result: " + aconnected.getResult());
-
-    UGoPickup.Builder goPickup = UGoPickup.newBuilder();
-    goPickup.setTruckid(1);
-    goPickup.setWhid(1);
-    goPickup.setSeqnum(10);
-
+    //Mock Amazon Over
+    //set simspeed
+    /*
+    UCommands.Builder simspeed = UCommands.newBuilder();
+    simspeed.setSimspeed(1000);
+    MessageTransmitter.sendMsgTo(simspeed.build(), worldConnection.getOutputStream());
+    */
+    
+    //form mock pickup
+    for(int i =1;i<5;i++){
+    Action newpickup = new Pickup(worldConnection.getOutputStream(),i,i,seqnum);
+    actionLists.put(seqnum,newpickup);
+    seqnum++;
+    newpickup.sendMessage();
+    }
     t.start();
-    UCommands.Builder uCommand = UCommands.newBuilder();
-    uCommand.addPickups(goPickup);
-    MessageTransmitter.sendMsgTo(uCommand.build(), worldConnection.getOutputStream());
+
     while (true) {
       UResponses.Builder Uresp;
       while ((Uresp = queue.poll()) != null) {
         ArrayList<Long> acks = new ArrayList<Long>();
         if (Uresp.getCompletionsCount() > 0) {
-          UFinished.Builder finished = Uresp.getCompletionsBuilder(0);
-          System.out.println("Truck id is: " + finished.getTruckid());
-          System.out.println("Status is: " + finished.getStatus());
+          for(int i = 0; i< Uresp.getCompletionsCount(); i++){
+          System.out.println("Truck id is: " + Uresp.getCompletions(i).getTruckid());
+          }
         }
         for (int i = 0; i < Uresp.getAcksCount(); i++) {
           System.out.println("Ack is : " + Uresp.getAcks(i));
           acks.add(Uresp.getAcks(i));
+          actionLists.get(Uresp.getAcks(i)).setAck();
         }
         UWsendAck(acks, worldConnection.getOutputStream());
       }
