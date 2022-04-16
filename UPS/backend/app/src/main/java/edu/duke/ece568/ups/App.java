@@ -56,6 +56,10 @@ public class App {
     UWReceiver listener = new UWReceiver(queue, worldConnection.getInputStream());
     Thread t = new Thread(listener);
 
+    //Connect to database
+    Database database = new Database(); 
+    database.connectDB();
+
     //init for ups side - initialize 100 trucks and create a new world
     worldid = initWorld(worldConnection.getInputStream(),worldConnection.getOutputStream());
 

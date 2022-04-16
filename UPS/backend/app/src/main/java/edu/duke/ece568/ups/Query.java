@@ -18,6 +18,7 @@ public class Query implements Action{
     private OutputStream out;
     private int truckid;
     private long seqnum;
+    UQuery.Builder query;
 
 
     public Query(OutputStream out, int truckid, long seqnum){
@@ -28,6 +29,7 @@ public class Query implements Action{
         UQuery.Builder query = UQuery.newBuilder();
         query.setTruckid(truckid);
         query.setSeqnum(seqnum);
+        this.query = query;
 
         UCommands.Builder uCommand = UCommands.newBuilder();
         uCommand.addQueries(query);
@@ -51,4 +53,7 @@ public class Query implements Action{
         cmd.setAck(ackNo);
     }
     
+    public void append(UCommands.Builder ucommand){
+        ucommand.addQueries(query);
+    }
 }

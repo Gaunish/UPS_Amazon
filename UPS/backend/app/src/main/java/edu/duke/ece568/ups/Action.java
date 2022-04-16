@@ -5,6 +5,7 @@ import java.io.OutputStream;
 
 import com.google.protobuf.GeneratedMessageV3;
 
+
 import edu.duke.ece568.ups.WorldUps.UCommands;
 
 public interface Action {
@@ -12,4 +13,5 @@ public interface Action {
     public boolean isTimeout();
     public void checkAck() throws IOException;
     public void setAck(long ackNo) throws IOException;
+    public void append(UCommands.Builder ucommand);
 }
