@@ -24,6 +24,7 @@ public class UWReceiver implements Runnable {
         }
       } 
       catch (InterruptedException e){
+        System.out.println(e.toString());
         break;
       }
     }
