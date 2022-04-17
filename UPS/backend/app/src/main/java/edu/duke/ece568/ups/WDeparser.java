@@ -33,6 +33,7 @@ public class WDeparser implements Runnable{
                 if(deparser.checkSeqNum(comp.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                //executor.execute(comp);
             }
         }
 

@@ -85,6 +85,9 @@ public class App {
     Aconnect.addInitwh(warehouse1);
     Aconnect.setIsAmazon(true);
 
+    //Executor executorA = new Executor(db, connA);
+    //Executor executorW = new Executor(db, connW);
+
     MessageTransmitter.sendMsgTo(Aconnect.build(), WAConnection.getOutputStream());
     AConnected.Builder aconnected = AConnected.newBuilder();
     MessageTransmitter.recvMsgFrom(aconnected, WAConnection.getInputStream());

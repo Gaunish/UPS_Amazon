@@ -40,6 +40,7 @@ public class ADeparser2 implements Runnable{
                 if(deparser.checkSeqNum(pickup.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                
             }
         }
 
@@ -79,7 +80,7 @@ public class ADeparser2 implements Runnable{
                     deparser.sendAcks_A(ackList);
                 }
                 catch(Exception e){
-                    
+
                 }
             }
         }
