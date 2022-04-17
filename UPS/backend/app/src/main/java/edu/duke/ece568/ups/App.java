@@ -21,6 +21,9 @@ import edu.duke.ece568.ups.WorldUps.UConnected;
 import edu.duke.ece568.ups.WorldUps.UInitTruck;
 import edu.duke.ece568.ups.WorldUps.UResponses;
 
+import edu.duke.ece568.ups.AmazonUps.AUCommand;   
+import edu.duke.ece568.ups.AmazonUps.UACommand;   
+
 public class App {
   public static void UWsendAck(ArrayList<Long> acks,OutputStream out) {
     UCommands.Builder uCommand = UCommands.newBuilder();
@@ -54,9 +57,7 @@ public class App {
 
   public static void main(String[] args) throws IOException, InterruptedException {
     long worldid;
-    long seqnum = 1;
-    HashMap<Long,Action>actionLists = new HashMap<Long,Action>();
-    HashSet<Long> receivedseq = new HashSet<Long>();
+    HashMap<Long,Action>worldActions = new HashMap<Long,Action>();
     BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
     ClientConnection worldConnection = new ClientConnection("172.18.0.1", 12345);
     UWReceiver listener = new UWReceiver(queue, worldConnection.getInputStream());
@@ -65,6 +66,12 @@ public class App {
     //Connect to database
     Database database = new Database(); 
     database.connectDB();
+
+    //Amazon Listening,sending queue
+    BlockingQueue<AUCommand.Builder> amzn_recv = new LinkedBlockingQueue<AUCommand.Builder>(50);
+    /*ClientConnection amznConnection = new ClientConnection("vcm-25935.vm.duke.edu", 6666);
+    UAListener amzn_listen = new UAListener(amzn_recv, amznConnection.getInputStream());
+    Thread amzn = new Thread(amzn_listen);*/
 
     //init for ups side - initialize 100 trucks and create a new world
     worldid = initWorld(database, worldConnection.getInputStream(),worldConnection.getOutputStream());
@@ -83,51 +90,14 @@ public class App {
     Aconnect.addInitwh(warehouse1);
     }
 
+    //Executor executorA = new Executor(db, connA);
+    //Executor executorW = new Executor(db, connW);
+
     MessageTransmitter.sendMsgTo(Aconnect.build(), WAConnection.getOutputStream());
     AConnected.Builder aconnected = AConnected.newBuilder();
     MessageTransmitter.recvMsgFrom(aconnected, WAConnection.getInputStream());
     System.out.println("worldID: " + aconnected.getWorldid());
     System.out.println("result: " + aconnected.getResult());
-    //Mock Amazon Over
-    //set simspeed
-    /*
-    UCommands.Builder simspeed = UCommands.newBuilder();
-    simspeed.setSimspeed(1000);
-    MessageTransmitter.sendMsgTo(simspeed.build(), worldConnection.getOutputStream());
-    */
-    
-    //form mock pickup
-    for(int i =1;i<5;i++){
-    Action newpickup = new Pickup(worldConnection.getOutputStream(),i,i,seqnum);
-    actionLists.put(seqnum,newpickup);
-    seqnum++;
-    newpickup.sendMessage();
-    }
-    t.start();
-
-    while (true) {
-      UResponses.Builder Uresp;
-      while ((Uresp = queue.poll()) != null) {
-        ArrayList<Long> acks = new ArrayList<Long>();
-        if (Uresp.getCompletionsCount() > 0) {
-          for(int i = 0; i< Uresp.getCompletionsCount(); i++){
-          System.out.println("Truck id is: " + Uresp.getCompletions(i).getTruckid());
-          System.out.println("Seq is : " + Uresp.getCompletions(i).getSeqnum());
-          }
-        }
-        if(Uresp.getErrorCount() >0){
-          for(int i =0; i<Uresp.getErrorCount();i++){
-            System.out.println("Error: "+ Uresp.getError(i).getErr());
-            System.out.println("Error Seq: "+Uresp.getError(i).getSeqnum());
-          }
-        }
-        for (int i = 0; i < Uresp.getAcksCount(); i++) {
-          System.out.println("Ack is : " + Uresp.getAcks(i));
-          acks.add(Uresp.getAcks(i));
-          actionLists.get(Uresp.getAcks(i)).setAck();
-        }
-        UWsendAck(acks, worldConnection.getOutputStream());
-      }
-    }
+  
   }
 }

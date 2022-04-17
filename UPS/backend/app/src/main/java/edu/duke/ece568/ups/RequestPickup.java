@@ -21,9 +21,6 @@ public class RequestPickup {
     
     /********************extract info*****************/
     AUPack aupack =request.getPack();
-    APack apack = aupack.getPackage();
-    long packageid = apack.getShipid();
-    int whid = apack.getWhnum();
     databaseActions();
     return formMessage();
   }
