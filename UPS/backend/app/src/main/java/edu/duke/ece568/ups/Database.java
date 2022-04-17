@@ -41,7 +41,7 @@ public class Database {
         }
     }
 
-    public String executeQuery(String query, String err){
+    public String executeStatement(String query, String err){
         String out = "Success";
         try{
             Statement s = c.createStatement();
@@ -57,26 +57,23 @@ public class Database {
 
     public void initDB(){
         String query1 = "CREATE TABLE TRUCK(TRUCK_ID INT PRIMARY KEY NOT NULL, X INT NOT NULL, Y INT NOT NULL, STATUS VARCHAR(20) NOT NULL);";
-        executeQuery(query1, "failure");
+        executeStatement(query1, "failure");
 
         //-1 Truck id means package has been delivered
         //-1 user id means no owner
         String query2 = "CREATE TABLE PACKAGE(PACKAGE_ID INT PRIMARY KEY NOT NULL, X INT NOT NULL, Y INT NOT NULL, TRUCK_ID INT NOT NULL, USER_ID INT NOT NULL, ITEMS VARCHAR(200));";
-        executeQuery(query2, "failure");
+        executeStatement(query2, "failure");
 
         String query3 = "CREATE TABLE USERS(USER_ID INT PRIMARY KEY NOT NULL, USERNAME VARCHAR(100) NOT NULL, PASSWORD VARCHAR(50) NOT NULL, SALT VARCHAR(50) NOT NULL);"; 
-        executeQuery(query3, "failure");
+        executeStatement(query3, "failure");
     }
 
     public void deleteDB(){
         String query1 = "DROP TABLE IF EXISTS TRUCK;";
-        executeQuery(query1, "failure");
+        executeStatement(query1, "failure");
         String query2 = "DROP TABLE IF EXISTS PACKAGE;";
-        executeQuery(query2, "failure");
+        executeStatement(query2, "failure");
         String query3 = "DROP TABLE IF EXISTS USERS;";
-        executeQuery(query3, "failure");
-
-
-    }
-    
+        executeStatement(query3, "failure");
+    }  
 }
