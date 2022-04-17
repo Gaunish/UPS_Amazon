@@ -40,10 +40,6 @@ public class Query implements Action{
     public void sendMessage() throws IOException{
         cmd.sendMessage();
     }
-    
-    public boolean isTimeout(){
-        return cmd.isTimeout();
-    }
 
     public boolean checkAck() throws IOException{
       return cmd.isAcked;

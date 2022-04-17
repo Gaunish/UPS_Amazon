@@ -1,5 +1,6 @@
 package edu.duke.ece568.ups;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
@@ -14,8 +15,9 @@ public class ADeparser {
   Database db;
   ArrayList<Long>acklist;
   HashSet<Long> receivedseq;
+  
 
-  public ADeparser(BlockingQueue<AUCommand.Builder> queue, Database db,HashSet<Long> receivedseq){
+  public ADeparser(BlockingQueue<AUCommand.Builder> queue, Database db,HashSet<Long> receivedseq,OutputStream out){
     this.queue = queue;
     this.db = db;
     this.receivedseq = receivedseq;

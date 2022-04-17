@@ -39,31 +39,5 @@ public class Command{
               }, 0, 5000);//1s timeout
       }
     
-      public boolean isTimeout(){
-        long currentTime = System.currentTimeMillis();
-        if((currentTime-timeofSending)>5000){
-          return true;
-        }
-        return false;
-      }
-    
-      public void checkAck() throws IOException{
-        if(!isAcked){
-          if(isTimeout()){
-            sendMessage();
-          }
-        }
-      }
-    
-      public void setAck(long ackNo) throws IOException{
-        UCommands.Builder uCommand = UCommands.newBuilder();
-        uCommand.addAcks(ackNo);
-    
-        if(!MessageTransmitter.sendMsgTo(uCommand.build(), out)){
-          throw new IOException("Error when trying to send ack to world");
-        }
-        isAcked = true;
-      }
-    
 }
 

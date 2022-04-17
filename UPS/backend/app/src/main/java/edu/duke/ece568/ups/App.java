@@ -112,6 +112,13 @@ public class App {
         if (Uresp.getCompletionsCount() > 0) {
           for(int i = 0; i< Uresp.getCompletionsCount(); i++){
           System.out.println("Truck id is: " + Uresp.getCompletions(i).getTruckid());
+          System.out.println("Seq is : " + Uresp.getCompletions(i).getSeqnum());
+          }
+        }
+        if(Uresp.getErrorCount() >0){
+          for(int i =0; i<Uresp.getErrorCount();i++){
+            System.out.println("Error: "+ Uresp.getError(i).getErr());
+            System.out.println("Error Seq: "+Uresp.getError(i).getSeqnum());
           }
         }
         for (int i = 0; i < Uresp.getAcksCount(); i++) {
