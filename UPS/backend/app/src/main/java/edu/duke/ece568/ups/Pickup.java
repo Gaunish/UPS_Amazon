@@ -8,6 +8,7 @@ import edu.duke.ece568.ups.WorldUps.UCommands;
 import edu.duke.ece568.ups.WorldUps.UDeliveryLocation;
 import edu.duke.ece568.ups.WorldUps.UGoDeliver;
 import edu.duke.ece568.ups.WorldUps.UGoPickup;
+import edu.duke.ece568.ups.AmazonUps.UACommand;
 
 public class Pickup implements Action{
     private Command cmd;
@@ -51,4 +52,11 @@ public class Pickup implements Action{
         ucommand.addPickups(pickup);
     }
     
+    public void append(UACommand.Builder aucommand){
+      return;    
+    }
+    
+    public String getType(){
+      return "Pickup";
+    }
 }

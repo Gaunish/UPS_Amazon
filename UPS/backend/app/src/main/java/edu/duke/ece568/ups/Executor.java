@@ -1,35 +1,33 @@
 package edu.duke.ece568.ups;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.IOException;
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import edu.duke.ece568.ups.AmazonUps.AUPack;
 import edu.duke.ece568.ups.AmazonUps.AUReadyForDelivery;
 import edu.duke.ece568.ups.AmazonUps.AURequestPickup;
+import edu.duke.ece568.ups.AmazonUps.Err;
 import edu.duke.ece568.ups.WorldAmazon.APack;
 import edu.duke.ece568.ups.WorldAmazon.AProduct;
 
 public class Executor {
-  Database db;
-  OutputStream out;
-  InputStream in;
-  public volatile long worldseqnum;
-  public volatile long amazonseqnum;
-  ConcurrentHashMap<Long, Action> worldActions;
-  ConcurrentHashMap<Long, Action> amazonActions;
+    Database db;
+    ClientConnection WConn, Aconn;
+  //volatile: any change made to this variable will be visible immediately in all threads
+  public volatile long worldseqnum,amazonseqnum;
+    ConcurrentHashMap<Long,Action> W_actions, A_actions; 
 
-  public Executor(Database db, InputStream in, OutputStream out, ConcurrentHashMap<Long, Action> worldActions, long worldseqnum,long amazonseqnum) {
-    this.db = db;
-    this.in = in;
-    this.out = out;
-    this.worldseqnum = worldseqnum;
-    this.amazonseqnum = amazonseqnum;
-    this.worldActions = worldActions;
-  }
+  public Executor(Database db, ClientConnection WConn, ClientConnection AConn, ConcurrentHashMap<Long,Action> W_actions, ConcurrentHashMap<Long,Action> A_actions, long wseq, long aseq){
+        this.db = db;
+        this.Aconn = AConn;
+        this.WConn = WConn;
+        this.W_actions = W_actions;
+        this.A_actions = A_actions;
+        this.worldseqnum = wseq;
+        this.amazonseqnum = aseq;
+    }
 
   public void execute(AURequestPickup pickup) {
     AUPack aupack = pickup.getPack();
@@ -62,8 +60,8 @@ public class Executor {
           truckid = newtruck.getInt("truck_id");
           sql = "UPDATE TRUCK SET STATUS = 'en route' AND WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
           db.executeStatement(sql, "failure");
-          Action pickup = new Pickup(out, truckid, whid, worldseqnum);
-          worldActions.put(worldseqnum, pickup);
+          Action pickup = new Pickup(WConn.getOutputStream(), truckid, whid, worldseqnum);
+          W_actions.put(worldseqnum, pickup);
           worldseqnum++;
           pickup.sendMessage();
         } else {
@@ -87,6 +85,21 @@ public class Executor {
     }
   }
 
+    public void execute(AUReadyForDelivery delivery) throws IOException {
+        int truck_id = delivery.getTruckid();
+        long seqnum = delivery.getSeqnum();
+        Deliver d = new Deliver(db, WConn.getOutputStream(), truck_id, worldseqnum);
+        d.sendMessage();
+        //String update_q = "UPDATE TRUCK SET STATUS = ";
+    }
+
+    public void execute(Err errA) throws IOException {
+        long origin_seqno = errA.getOriginSeqnum();
+        long err_seqno = errA.getErrorSeqnum();
+        Action a = A_actions.get(origin_seqno);
+    }
+       
+
   private void AssociateUPSAccount(long packageid,String username) {
     String sql = "SELECT COUNT(*) FROM USERS WHERE USERNAME = "+username+";";
     try{
@@ -98,17 +111,13 @@ public class Executor {
       ismatched = false;
     }
     //form UAIsAssociated from packageid and ismatch
-    Action isAssociated = new IsAssociated(out, packageid, ismatched, amazonseqnum);
-    amazonActions.put(amazonseqnum,isAssociated);
+    Action isAssociated = new AUassoc(Aconn.getOutputStream(), packageid, ismatched, amazonseqnum);
+    A_actions.put(amazonseqnum,isAssociated);
     amazonseqnum++;
     isAssociated.sendMessage();
     }catch(Exception e){
       e.printStackTrace();
     }
-  }
-
-  public void execute(AUReadyForDelivery delivery) {
-
   }
 
 }

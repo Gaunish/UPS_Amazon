@@ -11,6 +11,7 @@ import edu.duke.ece568.ups.WorldUps.UDeliveryLocation;
 import edu.duke.ece568.ups.WorldUps.UGoDeliver;
 import edu.duke.ece568.ups.WorldUps.UGoPickup;
 import edu.duke.ece568.ups.WorldUps.UQuery;
+import edu.duke.ece568.ups.AmazonUps.UACommand;
 
 
 public class Query implements Action{
@@ -51,5 +52,13 @@ public class Query implements Action{
     
     public void append(UCommands.Builder ucommand){
         ucommand.addQueries(query);
+    }
+
+    public void append(UACommand.Builder aucommand){
+      return;    
+    }
+    
+    public String getType(){
+      return "Query";
     }
 }
