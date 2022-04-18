@@ -7,10 +7,22 @@ import edu.duke.ece568.ups.AmazonUps.UACommand;
 import edu.duke.ece568.ups.AmazonUps.UAIsAssociated;
 import edu.duke.ece568.ups.WorldUps.UCommands;
 
-public class AUassoc {
+public class AUassoc implements Action {
     private Command cmd;
     private OutputStream out;
     private UAIsAssociated.Builder assoc;
+
+  public AUassoc(OutputStream out, long packageid,boolean ismatched,long seqnum){
+    UAIsAssociated.Builder isAssociated = UAIsAssociated.newBuilder();
+    isAssociated.setPackageid(packageid);
+    isAssociated.setCheckResult(ismatched);
+    this.assoc = isAssociated;
+    UACommand.Builder uaCommand = UACommand.newBuilder();
+    uaCommand.addLinkResult(isAssociated);
+
+    this.cmd = new Command(out,uaCommand.build(),seqnum);
+    
+  }
     
     public void sendMessage() throws IOException{
         cmd.sendMessage();
