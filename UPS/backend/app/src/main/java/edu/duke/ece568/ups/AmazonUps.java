@@ -2458,28 +2458,17 @@ public final class AmazonUps {
     int getWhnum();
 
     /**
-     * <code>repeated .AUPack packages = 2;</code>
+     * <code>repeated int64 packageid = 2;</code>
      */
-    java.util.List<AmazonUps.AUPack> 
-        getPackagesList();
+    java.util.List<java.lang.Long> getPackageidList();
     /**
-     * <code>repeated .AUPack packages = 2;</code>
+     * <code>repeated int64 packageid = 2;</code>
      */
-    AmazonUps.AUPack getPackages(int index);
+    int getPackageidCount();
     /**
-     * <code>repeated .AUPack packages = 2;</code>
+     * <code>repeated int64 packageid = 2;</code>
      */
-    int getPackagesCount();
-    /**
-     * <code>repeated .AUPack packages = 2;</code>
-     */
-    java.util.List<? extends AmazonUps.AUPackOrBuilder> 
-        getPackagesOrBuilderList();
-    /**
-     * <code>repeated .AUPack packages = 2;</code>
-     */
-    AmazonUps.AUPackOrBuilder getPackagesOrBuilder(
-        int index);
+    long getPackageid(int index);
 
     /**
      * <code>required int32 truckid = 3;</code>
@@ -2513,7 +2502,7 @@ public final class AmazonUps {
     }
     private UAReadyForPickup() {
       whnum_ = 0;
-      packages_ = java.util.Collections.emptyList();
+      packageid_ = java.util.Collections.emptyList();
       truckid_ = 0;
       seqnum_ = 0L;
     }
@@ -2547,13 +2536,25 @@ public final class AmazonUps {
               whnum_ = input.readInt32();
               break;
             }
-            case 18: {
+            case 16: {
               if (!((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-                packages_ = new java.util.ArrayList<AmazonUps.AUPack>();
+                packageid_ = new java.util.ArrayList<java.lang.Long>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              packages_.add(
-                  input.readMessage(AmazonUps.AUPack.PARSER, extensionRegistry));
+              packageid_.add(input.readInt64());
+              break;
+            }
+            case 18: {
+              int length = input.readRawVarint32();
+              int limit = input.pushLimit(length);
+              if (!((mutable_bitField0_ & 0x00000002) == 0x00000002) && input.getBytesUntilLimit() > 0) {
+                packageid_ = new java.util.ArrayList<java.lang.Long>();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              while (input.getBytesUntilLimit() > 0) {
+                packageid_.add(input.readInt64());
+              }
+              input.popLimit(limit);
               break;
             }
             case 24: {
@@ -2582,7 +2583,7 @@ public final class AmazonUps {
             e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
-          packages_ = java.util.Collections.unmodifiableList(packages_);
+          packageid_ = java.util.Collections.unmodifiableList(packageid_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2617,39 +2618,26 @@ public final class AmazonUps {
       return whnum_;
     }
 
-    public static final int PACKAGES_FIELD_NUMBER = 2;
-    private java.util.List<AmazonUps.AUPack> packages_;
+    public static final int PACKAGEID_FIELD_NUMBER = 2;
+    private java.util.List<java.lang.Long> packageid_;
     /**
-     * <code>repeated .AUPack packages = 2;</code>
+     * <code>repeated int64 packageid = 2;</code>
      */
-    public java.util.List<AmazonUps.AUPack> getPackagesList() {
-      return packages_;
+    public java.util.List<java.lang.Long>
+        getPackageidList() {
+      return packageid_;
     }
     /**
-     * <code>repeated .AUPack packages = 2;</code>
+     * <code>repeated int64 packageid = 2;</code>
      */
-    public java.util.List<? extends AmazonUps.AUPackOrBuilder> 
-        getPackagesOrBuilderList() {
-      return packages_;
+    public int getPackageidCount() {
+      return packageid_.size();
     }
     /**
-     * <code>repeated .AUPack packages = 2;</code>
+     * <code>repeated int64 packageid = 2;</code>
      */
-    public int getPackagesCount() {
-      return packages_.size();
-    }
-    /**
-     * <code>repeated .AUPack packages = 2;</code>
-     */
-    public AmazonUps.AUPack getPackages(int index) {
-      return packages_.get(index);
-    }
-    /**
-     * <code>repeated .AUPack packages = 2;</code>
-     */
-    public AmazonUps.AUPackOrBuilder getPackagesOrBuilder(
-        int index) {
-      return packages_.get(index);
+    public long getPackageid(int index) {
+      return packageid_.get(index);
     }
 
     public static final int TRUCKID_FIELD_NUMBER = 3;
@@ -2701,12 +2689,6 @@ public final class AmazonUps {
         memoizedIsInitialized = 0;
         return false;
       }
-      for (int i = 0; i < getPackagesCount(); i++) {
-        if (!getPackages(i).isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
-      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -2717,8 +2699,8 @@ public final class AmazonUps {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, whnum_);
       }
-      for (int i = 0; i < packages_.size(); i++) {
-        output.writeMessage(2, packages_.get(i));
+      for (int i = 0; i < packageid_.size(); i++) {
+        output.writeInt64(2, packageid_.get(i));
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeInt32(3, truckid_);
@@ -2739,9 +2721,14 @@ public final class AmazonUps {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, whnum_);
       }
-      for (int i = 0; i < packages_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, packages_.get(i));
+      {
+        int dataSize = 0;
+        for (int i = 0; i < packageid_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeInt64SizeNoTag(packageid_.get(i));
+        }
+        size += dataSize;
+        size += 1 * getPackageidList().size();
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
@@ -2772,8 +2759,8 @@ public final class AmazonUps {
         result = result && (getWhnum()
             == other.getWhnum());
       }
-      result = result && getPackagesList()
-          .equals(other.getPackagesList());
+      result = result && getPackageidList()
+          .equals(other.getPackageidList());
       result = result && (hasTruckid() == other.hasTruckid());
       if (hasTruckid()) {
         result = result && (getTruckid()
@@ -2799,9 +2786,9 @@ public final class AmazonUps {
         hash = (37 * hash) + WHNUM_FIELD_NUMBER;
         hash = (53 * hash) + getWhnum();
       }
-      if (getPackagesCount() > 0) {
-        hash = (37 * hash) + PACKAGES_FIELD_NUMBER;
-        hash = (53 * hash) + getPackagesList().hashCode();
+      if (getPackageidCount() > 0) {
+        hash = (37 * hash) + PACKAGEID_FIELD_NUMBER;
+        hash = (53 * hash) + getPackageidList().hashCode();
       }
       if (hasTruckid()) {
         hash = (37 * hash) + TRUCKID_FIELD_NUMBER;
@@ -2940,7 +2927,6 @@ public final class AmazonUps {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getPackagesFieldBuilder();
         }
       }
       @java.lang.Override
@@ -2948,12 +2934,8 @@ public final class AmazonUps {
         super.clear();
         whnum_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        if (packagesBuilder_ == null) {
-          packages_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-        } else {
-          packagesBuilder_.clear();
-        }
+        packageid_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
         truckid_ = 0;
         bitField0_ = (bitField0_ & ~0x00000004);
         seqnum_ = 0L;
@@ -2990,15 +2972,11 @@ public final class AmazonUps {
           to_bitField0_ |= 0x00000001;
         }
         result.whnum_ = whnum_;
-        if (packagesBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002)) {
-            packages_ = java.util.Collections.unmodifiableList(packages_);
-            bitField0_ = (bitField0_ & ~0x00000002);
-          }
-          result.packages_ = packages_;
-        } else {
-          result.packages_ = packagesBuilder_.build();
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          packageid_ = java.util.Collections.unmodifiableList(packageid_);
+          bitField0_ = (bitField0_ & ~0x00000002);
         }
+        result.packageid_ = packageid_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000002;
         }
@@ -3059,31 +3037,15 @@ public final class AmazonUps {
         if (other.hasWhnum()) {
           setWhnum(other.getWhnum());
         }
-        if (packagesBuilder_ == null) {
-          if (!other.packages_.isEmpty()) {
-            if (packages_.isEmpty()) {
-              packages_ = other.packages_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-            } else {
-              ensurePackagesIsMutable();
-              packages_.addAll(other.packages_);
-            }
-            onChanged();
+        if (!other.packageid_.isEmpty()) {
+          if (packageid_.isEmpty()) {
+            packageid_ = other.packageid_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensurePackageidIsMutable();
+            packageid_.addAll(other.packageid_);
           }
-        } else {
-          if (!other.packages_.isEmpty()) {
-            if (packagesBuilder_.isEmpty()) {
-              packagesBuilder_.dispose();
-              packagesBuilder_ = null;
-              packages_ = other.packages_;
-              bitField0_ = (bitField0_ & ~0x00000002);
-              packagesBuilder_ = 
-                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                   getPackagesFieldBuilder() : null;
-            } else {
-              packagesBuilder_.addAllMessages(other.packages_);
-            }
-          }
+          onChanged();
         }
         if (other.hasTruckid()) {
           setTruckid(other.getTruckid());
@@ -3106,11 +3068,6 @@ public final class AmazonUps {
         }
         if (!hasSeqnum()) {
           return false;
-        }
-        for (int i = 0; i < getPackagesCount(); i++) {
-          if (!getPackages(i).isInitialized()) {
-            return false;
-          }
         }
         return true;
       }
@@ -3167,244 +3124,70 @@ public final class AmazonUps {
         return this;
       }
 
-      private java.util.List<AmazonUps.AUPack> packages_ =
-        java.util.Collections.emptyList();
-      private void ensurePackagesIsMutable() {
+      private java.util.List<java.lang.Long> packageid_ = java.util.Collections.emptyList();
+      private void ensurePackageidIsMutable() {
         if (!((bitField0_ & 0x00000002) == 0x00000002)) {
-          packages_ = new java.util.ArrayList<AmazonUps.AUPack>(packages_);
+          packageid_ = new java.util.ArrayList<java.lang.Long>(packageid_);
           bitField0_ |= 0x00000002;
          }
       }
-
-      private com.google.protobuf.RepeatedFieldBuilderV3<
-          AmazonUps.AUPack, AmazonUps.AUPack.Builder, AmazonUps.AUPackOrBuilder> packagesBuilder_;
-
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public java.util.List<AmazonUps.AUPack> getPackagesList() {
-        if (packagesBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(packages_);
-        } else {
-          return packagesBuilder_.getMessageList();
-        }
+      public java.util.List<java.lang.Long>
+          getPackageidList() {
+        return java.util.Collections.unmodifiableList(packageid_);
       }
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public int getPackagesCount() {
-        if (packagesBuilder_ == null) {
-          return packages_.size();
-        } else {
-          return packagesBuilder_.getCount();
-        }
+      public int getPackageidCount() {
+        return packageid_.size();
       }
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public AmazonUps.AUPack getPackages(int index) {
-        if (packagesBuilder_ == null) {
-          return packages_.get(index);
-        } else {
-          return packagesBuilder_.getMessage(index);
-        }
+      public long getPackageid(int index) {
+        return packageid_.get(index);
       }
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public Builder setPackages(
-          int index, AmazonUps.AUPack value) {
-        if (packagesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePackagesIsMutable();
-          packages_.set(index, value);
-          onChanged();
-        } else {
-          packagesBuilder_.setMessage(index, value);
-        }
+      public Builder setPackageid(
+          int index, long value) {
+        ensurePackageidIsMutable();
+        packageid_.set(index, value);
+        onChanged();
         return this;
       }
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public Builder setPackages(
-          int index, AmazonUps.AUPack.Builder builderForValue) {
-        if (packagesBuilder_ == null) {
-          ensurePackagesIsMutable();
-          packages_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          packagesBuilder_.setMessage(index, builderForValue.build());
-        }
+      public Builder addPackageid(long value) {
+        ensurePackageidIsMutable();
+        packageid_.add(value);
+        onChanged();
         return this;
       }
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public Builder addPackages(AmazonUps.AUPack value) {
-        if (packagesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePackagesIsMutable();
-          packages_.add(value);
-          onChanged();
-        } else {
-          packagesBuilder_.addMessage(value);
-        }
+      public Builder addAllPackageid(
+          java.lang.Iterable<? extends java.lang.Long> values) {
+        ensurePackageidIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, packageid_);
+        onChanged();
         return this;
       }
       /**
-       * <code>repeated .AUPack packages = 2;</code>
+       * <code>repeated int64 packageid = 2;</code>
        */
-      public Builder addPackages(
-          int index, AmazonUps.AUPack value) {
-        if (packagesBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensurePackagesIsMutable();
-          packages_.add(index, value);
-          onChanged();
-        } else {
-          packagesBuilder_.addMessage(index, value);
-        }
+      public Builder clearPackageid() {
+        packageid_ = java.util.Collections.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
         return this;
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public Builder addPackages(
-          AmazonUps.AUPack.Builder builderForValue) {
-        if (packagesBuilder_ == null) {
-          ensurePackagesIsMutable();
-          packages_.add(builderForValue.build());
-          onChanged();
-        } else {
-          packagesBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public Builder addPackages(
-          int index, AmazonUps.AUPack.Builder builderForValue) {
-        if (packagesBuilder_ == null) {
-          ensurePackagesIsMutable();
-          packages_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          packagesBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public Builder addAllPackages(
-          java.lang.Iterable<? extends AmazonUps.AUPack> values) {
-        if (packagesBuilder_ == null) {
-          ensurePackagesIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, packages_);
-          onChanged();
-        } else {
-          packagesBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public Builder clearPackages() {
-        if (packagesBuilder_ == null) {
-          packages_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000002);
-          onChanged();
-        } else {
-          packagesBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public Builder removePackages(int index) {
-        if (packagesBuilder_ == null) {
-          ensurePackagesIsMutable();
-          packages_.remove(index);
-          onChanged();
-        } else {
-          packagesBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public AmazonUps.AUPack.Builder getPackagesBuilder(
-          int index) {
-        return getPackagesFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public AmazonUps.AUPackOrBuilder getPackagesOrBuilder(
-          int index) {
-        if (packagesBuilder_ == null) {
-          return packages_.get(index);  } else {
-          return packagesBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public java.util.List<? extends AmazonUps.AUPackOrBuilder> 
-           getPackagesOrBuilderList() {
-        if (packagesBuilder_ != null) {
-          return packagesBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(packages_);
-        }
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public AmazonUps.AUPack.Builder addPackagesBuilder() {
-        return getPackagesFieldBuilder().addBuilder(
-            AmazonUps.AUPack.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public AmazonUps.AUPack.Builder addPackagesBuilder(
-          int index) {
-        return getPackagesFieldBuilder().addBuilder(
-            index, AmazonUps.AUPack.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .AUPack packages = 2;</code>
-       */
-      public java.util.List<AmazonUps.AUPack.Builder> 
-           getPackagesBuilderList() {
-        return getPackagesFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilderV3<
-          AmazonUps.AUPack, AmazonUps.AUPack.Builder, AmazonUps.AUPackOrBuilder> 
-          getPackagesFieldBuilder() {
-        if (packagesBuilder_ == null) {
-          packagesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-              AmazonUps.AUPack, AmazonUps.AUPack.Builder, AmazonUps.AUPackOrBuilder>(
-                  packages_,
-                  ((bitField0_ & 0x00000002) == 0x00000002),
-                  getParentForChildren(),
-                  isClean());
-          packages_ = null;
-        }
-        return packagesBuilder_;
       }
 
       private int truckid_ ;
@@ -10489,24 +10272,24 @@ public final class AmazonUps {
       "\007truckid\030\001 \002(\005\022\016\n\006seqnum\030\002 \002(\003\",\n\tUAConn" +
       "ect\022\017\n\007worldid\030\001 \002(\003\022\016\n\006seqnum\030\002 \002(\003\">\n\013" +
       "AUConnected\022\037\n\027world_connection_status\030\001" +
-      " \002(\010\022\016\n\006seqnum\030\002 \002(\003\"]\n\020UAReadyForPickup" +
-      "\022\r\n\005whnum\030\001 \002(\005\022\031\n\010packages\030\002 \003(\0132\007.AUPa" +
-      "ck\022\017\n\007truckid\030\003 \002(\005\022\016\n\006seqnum\030\004 \002(\003\"8\n\016U" +
-      "AIsAssociated\022\021\n\tpackageid\030\001 \002(\003\022\023\n\013chec" +
-      "kResult\030\002 \002(\010\"8\n\017AURequestPickup\022\025\n\004pack" +
-      "\030\001 \002(\0132\007.AUPack\022\016\n\006seqnum\030\002 \002(\003\"S\n\006AUPac" +
-      "k\022\027\n\007package\030\001 \002(\0132\006.APack\022\022\n\nupsAccount" +
-      "\030\002 \001(\t\022\r\n\005destx\030\003 \002(\005\022\r\n\005desty\030\004 \002(\005\"\252\001\n" +
-      "\tUACommand\022&\n\013pickupReady\030\001 \003(\0132\021.UARead" +
-      "yForPickup\022-\n\020packageDelivered\030\002 \003(\0132\023.U" +
-      "APackageDelivered\022#\n\nlinkResult\030\003 \003(\0132\017." +
-      "UAIsAssociated\022\023\n\005error\030\004 \003(\0132\004.Err\022\014\n\004a" +
-      "cks\030\005 \003(\003\"\203\001\n\tAUCommand\022\'\n\rpickupRequest" +
-      "\030\001 \003(\0132\020.AURequestPickup\022*\n\rdeliveryRead" +
-      "y\030\002 \003(\0132\023.AUReadyForDelivery\022\023\n\005error\030\003 " +
-      "\003(\0132\004.Err\022\014\n\004acks\030\004 \003(\003\"C\n\003Err\022\021\n\terrorI" +
-      "nfo\030\001 \002(\t\022\024\n\014originSeqnum\030\002 \002(\003\022\023\n\013error" +
-      "Seqnum\030\003 \002(\003"
+      " \002(\010\022\016\n\006seqnum\030\002 \002(\003\"U\n\020UAReadyForPickup" +
+      "\022\r\n\005whnum\030\001 \002(\005\022\021\n\tpackageid\030\002 \003(\003\022\017\n\007tr" +
+      "uckid\030\003 \002(\005\022\016\n\006seqnum\030\004 \002(\003\"8\n\016UAIsAssoc" +
+      "iated\022\021\n\tpackageid\030\001 \002(\003\022\023\n\013checkResult\030" +
+      "\002 \002(\010\"8\n\017AURequestPickup\022\025\n\004pack\030\001 \002(\0132\007" +
+      ".AUPack\022\016\n\006seqnum\030\002 \002(\003\"S\n\006AUPack\022\027\n\007pac" +
+      "kage\030\001 \002(\0132\006.APack\022\022\n\nupsAccount\030\002 \001(\t\022\r" +
+      "\n\005destx\030\003 \002(\005\022\r\n\005desty\030\004 \002(\005\"\252\001\n\tUAComma" +
+      "nd\022&\n\013pickupReady\030\001 \003(\0132\021.UAReadyForPick" +
+      "up\022-\n\020packageDelivered\030\002 \003(\0132\023.UAPackage" +
+      "Delivered\022#\n\nlinkResult\030\003 \003(\0132\017.UAIsAsso" +
+      "ciated\022\023\n\005error\030\004 \003(\0132\004.Err\022\014\n\004acks\030\005 \003(" +
+      "\003\"\203\001\n\tAUCommand\022\'\n\rpickupRequest\030\001 \003(\0132\020" +
+      ".AURequestPickup\022*\n\rdeliveryReady\030\002 \003(\0132" +
+      "\023.AUReadyForDelivery\022\023\n\005error\030\003 \003(\0132\004.Er" +
+      "r\022\014\n\004acks\030\004 \003(\003\"C\n\003Err\022\021\n\terrorInfo\030\001 \002(" +
+      "\t\022\024\n\014originSeqnum\030\002 \002(\003\022\023\n\013errorSeqnum\030\003" +
+      " \002(\003"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10550,7 +10333,7 @@ public final class AmazonUps {
     internal_static_UAReadyForPickup_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_UAReadyForPickup_descriptor,
-        new java.lang.String[] { "Whnum", "Packages", "Truckid", "Seqnum", });
+        new java.lang.String[] { "Whnum", "Packageid", "Truckid", "Seqnum", });
     internal_static_UAIsAssociated_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_UAIsAssociated_fieldAccessorTable = new

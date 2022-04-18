@@ -47,4 +47,8 @@ public class AUassoc implements Action {
     public String getType(){
       return "AUAssoc";
     }
+
+    public int getTruckid(){
+      return -1;
+    }
 }

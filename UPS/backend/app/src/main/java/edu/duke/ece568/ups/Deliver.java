@@ -81,4 +81,8 @@ public class Deliver implements Action{
     public String getType(){
       return "Deliver";
     }
+
+    public int getTruckid(){
+      return truckid;
+    }
 }

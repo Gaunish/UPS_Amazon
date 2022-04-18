@@ -12,6 +12,7 @@ public class AUDeliver implements Action{
     private Command cmd;
     private OutputStream out;
     private UAPackageDelivered.Builder deliver;
+    private int truckid;
     
     public void sendMessage() throws IOException{
         cmd.sendMessage();
@@ -35,5 +36,9 @@ public class AUDeliver implements Action{
     
     public String getType(){
       return "AUDeliver";
+    }
+
+    public int getTruckid(){
+      return truckid;
     }
 }
