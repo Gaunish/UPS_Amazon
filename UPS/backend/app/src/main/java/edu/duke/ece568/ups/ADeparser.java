@@ -15,18 +15,20 @@ import edu.duke.ece568.ups.AmazonUps.Err;
 
 import edu.duke.ece568.ups.WorldUps.*;
 
-public class ADeparser2 implements Runnable{
+public class ADeparser implements Runnable{
     BlockingQueue<AUCommand.Builder> queue;
     Database db;
     ArrayList<Long>ackList;
     HashSet<Long> recvSeq;
     Deparser deparser;
     ClientConnection conn;
+    Executor exec;
 
-    public ADeparser2(ClientConnection conn, BlockingQueue<AUCommand.Builder> queue, Database db){
+    public ADeparser(Executor e, ClientConnection conn, BlockingQueue<AUCommand.Builder> queue, Database db){
         this.queue = queue;
         this.db = db;
         this.conn = conn;
+        this.exec = e;
 
         ackList = new ArrayList<>();
         recvSeq = new HashSet<>();
@@ -50,6 +52,10 @@ public class ADeparser2 implements Runnable{
                 if(deparser.checkSeqNum(delivery.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                try{
+                    exec.execute(delivery);
+                }
+                catch(Exception e){}
             }
         }
 

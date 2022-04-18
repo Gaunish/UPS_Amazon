@@ -64,7 +64,8 @@ message AUCommand{
 
 message Err{
 	required string errorInfo = 1;
-	required int64 errorSeqnum = 2;	
+	required int64 originSeqnum = 2;
+	required int64 errorSeqnum = 3;	
 };
 
 
