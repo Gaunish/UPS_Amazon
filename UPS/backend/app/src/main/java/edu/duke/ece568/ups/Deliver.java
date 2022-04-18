@@ -39,17 +39,13 @@ public class Deliver implements Action{
     public void sendMessage() throws IOException{
         cmd.sendMessage();
     }
-    
-    public boolean isTimeout(){
-        return cmd.isTimeout();
+
+    public boolean checkAck() throws IOException{
+      return cmd.isAcked;
     }
 
-    public void checkAck() throws IOException{
-        cmd.checkAck();
-    }
-
-    public void setAck(long ackNo) throws IOException{
-        cmd.setAck(ackNo);
+    public void setAck() throws IOException{
+      cmd.isAcked = true;
     }
 
     public void append(UCommands.Builder ucommand){

@@ -1,7 +1,7 @@
 package edu.duke.ece568.ups;
 
-import edu.duke.ece568.ups.AmazonUps.AURequestPickup;
 import edu.duke.ece568.ups.AmazonUps.AUReadyForDelivery;
+import edu.duke.ece568.ups.AmazonUps.AURequestPickup;
 
 public class Executor {
 
