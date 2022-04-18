@@ -15,7 +15,7 @@ import edu.duke.ece568.ups.AmazonUps.Err;
 
 import edu.duke.ece568.ups.WorldUps.*;
 
-public class ADeparser2 implements Runnable{
+public class ADeparser implements Runnable{
     BlockingQueue<AUCommand.Builder> queue;
     Database db;
     ArrayList<Long>ackList;
@@ -23,7 +23,7 @@ public class ADeparser2 implements Runnable{
     Deparser deparser;
     ClientConnection conn;
 
-    public ADeparser2(ClientConnection conn, BlockingQueue<AUCommand.Builder> queue, Database db){
+    public ADeparser(ClientConnection conn, BlockingQueue<AUCommand.Builder> queue, Database db){
         this.queue = queue;
         this.db = db;
         this.conn = conn;
