@@ -22,11 +22,13 @@ public class ADeparser2 implements Runnable{
     HashSet<Long> recvSeq;
     Deparser deparser;
     ClientConnection conn;
+    Executor exec;
 
-    public ADeparser2(ClientConnection conn, BlockingQueue<AUCommand.Builder> queue, Database db){
+    public ADeparser2(Executor e, ClientConnection conn, BlockingQueue<AUCommand.Builder> queue, Database db){
         this.queue = queue;
         this.db = db;
         this.conn = conn;
+        this.exec = e;
 
         ackList = new ArrayList<>();
         recvSeq = new HashSet<>();
@@ -50,6 +52,10 @@ public class ADeparser2 implements Runnable{
                 if(deparser.checkSeqNum(delivery.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                try{
+                    exec.execute(delivery);
+                }
+                catch(Exception e){}
             }
         }
 
