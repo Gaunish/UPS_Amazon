@@ -11,6 +11,8 @@ import edu.duke.ece568.ups.AmazonUps.AURequestPickup;
 import edu.duke.ece568.ups.AmazonUps.Err;
 import edu.duke.ece568.ups.WorldAmazon.APack;
 import edu.duke.ece568.ups.WorldAmazon.AProduct;
+import edu.duke.ece568.ups.WorldUps.UDeliveryMade;
+import edu.duke.ece568.ups.WorldUps.UTruck;
 
 public class Executor {
     Database db;
@@ -99,8 +101,36 @@ public class Executor {
         long err_seqno = errA.getErrorSeqnum();
         Action a = A_actions.get(origin_seqno);
     }
-       
 
+  public void execute(UDeliveryMade delivered){
+    long packageid = delivered.getPackageid();
+    updatePackageStatus(packageid, "delivered");
+    try{
+    Action deliveryMade = new Delivered(Aconn.getOutputStream(),packageid,amazonseqnum);
+    deliveryMade.sendMessage();
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+  }
+
+  public void execute(UTruck truckstatus){
+    int truckid = truckstatus.getTruckid();
+    String status = truckstatus.getStatus();
+    int x = truckstatus.getX();
+    int y = truckstatus.getY();
+    updateTruckStatus(truckid, status,x,y);
+  }
+
+  private void updatePackageStatus(long packageid,String status){
+    String sql = "UPDATE PACKAGE SET STATUS = '"+status+"' WHERE PACKAGE_ID = "+packageid+";";
+    db.executeStatement(sql, "failure");
+  }
+
+  private void updateTruckStatus(int truckid,String status,int x, int y){
+    String sql = "UPDATE TRUCK SET STATUS = '"+status+"', X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
+    db.executeStatement(sql, "failure");
+  }
+       
   private void AssociateUPSAccount(long packageid,String username) {
     String sql = "SELECT COUNT(*) FROM USERS WHERE USERNAME = "+username+";";
     try{

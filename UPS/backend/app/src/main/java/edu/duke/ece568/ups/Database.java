@@ -56,7 +56,7 @@ public class Database {
     } 
 
     public void initDB(){
-        String query1 = "CREATE TABLE TRUCK(TRUCK_ID INT PRIMARY KEY NOT NULL, WHID INT NOT NULL, STATUS VARCHAR(20) NOT NULL);";
+        String query1 = "CREATE TABLE TRUCK(TRUCK_ID INT PRIMARY KEY NOT NULL, WHID INT NOT NULL, STATUS VARCHAR(20) NOT NULL,X INT NOT NULL, Y INT NOT NULL);";
         executeStatement(query1, "failure");
 
         //-1 Truck id means package has been delivered
