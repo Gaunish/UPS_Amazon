@@ -85,6 +85,11 @@ public class WDeparser implements Runnable{
         if(resp.getAcksCount() > 0){
             for(long acks : resp.getAcksList()){
                 //deparse acks
+                try{
+                    executor.execute(acks, true);
+                }
+                catch(Exception e){}
+    
             }
         }
 

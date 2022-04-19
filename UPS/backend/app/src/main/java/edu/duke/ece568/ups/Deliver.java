@@ -85,4 +85,8 @@ public class Deliver implements Action{
     public int getTruckid(){
       return truckid;
     }
+
+    public long getSeqnum(){
+      return seqnum;
+    }
 }

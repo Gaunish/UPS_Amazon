@@ -63,4 +63,8 @@ public class Pickup implements Action{
     public int getTruckid(){
       return truckid;
     }
+    public long getSeqnum(){
+      return seqnum;
+    }
+
 }
