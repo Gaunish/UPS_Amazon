@@ -49,7 +49,7 @@ public class Executor {
 
   private void UpdatePackageTable(int whid, long packageid, int x, int y, String username) {
     // query truck status
-    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\';";
+    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
     ResultSet truckstatus = db.SelectStatement(sql);
     int truckid;
     try {
@@ -108,6 +108,8 @@ public class Executor {
 
           db.executeStatement(q1, "failure");
           db.executeStatement(q2, "failure");
+
+          //update status of truck
         }
     }
        
@@ -173,6 +175,8 @@ public class Executor {
 
       String update = "UPDATE TRUCK SET STATUS = \'IDLE\' WHERE TRUCK_ID = " + truck_id + ";";
       db.executeStatement(update, "failure");
+
+      //send error back to amazon
 
     }
     else if(a.getType() == "Deliver"){
