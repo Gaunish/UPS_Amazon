@@ -49,4 +49,8 @@ public class AUDeliver implements Action{
     public String getType(){
       return "AUDeliver";
     }
+
+    public int getTruckid(){
+      return -1;
+    }
 }

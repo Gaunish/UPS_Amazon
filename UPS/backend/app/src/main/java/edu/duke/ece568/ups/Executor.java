@@ -11,8 +11,8 @@ import edu.duke.ece568.ups.AmazonUps.AURequestPickup;
 import edu.duke.ece568.ups.AmazonUps.Err;
 import edu.duke.ece568.ups.WorldAmazon.APack;
 import edu.duke.ece568.ups.WorldAmazon.AProduct;
-import edu.duke.ece568.ups.WorldUps.UDeliveryMade;
-import edu.duke.ece568.ups.WorldUps.UTruck;
+import edu.duke.ece568.ups.AmazonUps.*;
+import edu.duke.ece568.ups.WorldUps.*;
 
 public class Executor {
     Database db;
@@ -96,10 +96,19 @@ public class Executor {
         //String update_q = "UPDATE TRUCK SET STATUS = ";
     }
 
+    //amazon error
     public void execute(Err errA) throws IOException {
         long origin_seqno = errA.getOriginSeqnum();
         long err_seqno = errA.getErrorSeqnum();
         Action a = A_actions.get(origin_seqno);
+        int truck_id = a.getTruckid();
+        if(a.getType() == "AUPickup"){
+          String q1 = "DELETE FROM PRODUCT WHERE PACKAGE_ID IN (SELECT PACKAGE_ID FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\');";
+          String q2 = "DELETE FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+
+          db.executeStatement(q1, "failure");
+          db.executeStatement(q2, "failure");
+        }
     }
 
   public void execute(UDeliveryMade delivered){
@@ -150,6 +159,55 @@ public class Executor {
     isAssociated.sendMessage();
     }catch(Exception e){
       e.printStackTrace();
+    }
+  }
+
+  public void execute(UFinished completions) throws IOException {
+    int truck_id = completions.getTruckid();
+    String status = completions.getStatus();
+     
+    String new_status = "";
+
+    //Pickup request
+    if(status.equals("arrive warehouse")){
+      new_status = "loading";
+
+      //send notification to amazon
+      Action pickupReady = new AUPickup(Aconn.getOutputStream(), db, truck_id, amazonseqnum); 
+      A_actions.put(amazonseqnum,pickupReady);
+      amazonseqnum++;
+      pickupReady.sendMessage();
+    }
+    else{
+      new_status = "idle";
+    }
+
+    //Update truck status
+    String update = "UPDATE TRUCK SET STATUS = \'" + new_status + "\' WHERE TRUCK_ID = " + truck_id + ";";
+    db.executeStatement(update, "failure");
+  }
+
+  //World error
+  public void execute(UErr err) throws IOException {
+    long origin_seqno = err.getOriginseqnum();
+    long err_seqno = err.getSeqnum();
+    Action a = A_actions.get(origin_seqno);
+    int truck_id = a.getTruckid();
+
+    if(a.getType() == "Pickup"){
+      String q1 = "DELETE FROM PRODUCT WHERE PACKAGE_ID IN (SELECT PACKAGE_ID FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\');";
+      String q2 = "DELETE FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+
+      db.executeStatement(q1, "failure");
+      db.executeStatement(q2, "failure");
+
+      String update = "UPDATE TRUCK SET STATUS = \'IDLE\' WHERE TRUCK_ID = " + truck_id + ";";
+      db.executeStatement(update, "failure");
+
+    }
+    else if(a.getType() == "Deliver"){
+      String update = "UPDATE TRUCK SET STATUS = \'ARRIVE WAREHOUSE\' WHERE TRUCK_ID = " + truck_id + ";";
+      db.executeStatement(update, "failure");
     }
   }
 

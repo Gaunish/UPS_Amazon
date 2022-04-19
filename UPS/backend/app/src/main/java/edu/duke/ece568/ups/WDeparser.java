@@ -61,6 +61,13 @@ public class WDeparser implements Runnable{
                 if(deparser.checkSeqNum(err.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                
+            }
+        }
+
+        if(resp.getAcksCount() > 0){
+            for(long acks : resp.getAcksList()){
+                //deparse acks
             }
         }
 

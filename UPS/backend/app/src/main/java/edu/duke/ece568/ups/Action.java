@@ -16,4 +16,6 @@ public interface Action {
     public String getType();
     public void append(UCommands.Builder ucommand);
     public void append(UACommand.Builder aucommand);
+
+    public int getTruckid();
 }
