@@ -11,7 +11,20 @@ import edu.duke.ece568.ups.WorldUps.UCommands;
 public class AUDeliver implements Action{
     private Command cmd;
     private OutputStream out;
-    private UAPackageDelivered.Builder deliver;
+    private UAPackageDelivered.Builder delivered;
+
+  public AUDeliver(OutputStream out, long packageid,long seqnum){
+    UAPackageDelivered.Builder delivered = UAPackageDelivered.newBuilder();
+    delivered.setPackageid(packageid);
+    delivered.setSeqnum(seqnum);
+    this.delivered = delivered;
+    this.out = out;
+    
+    UACommand.Builder uaCommand = UACommand.newBuilder();
+    uaCommand.addPackageDelivered(delivered);
+
+    this.cmd = new Command(out,uaCommand.build(),seqnum);
+  }
     
     public void sendMessage() throws IOException{
         cmd.sendMessage();
@@ -30,7 +43,7 @@ public class AUDeliver implements Action{
     }
 
     public void append(UACommand.Builder aucommand){
-        aucommand.addPackageDelivered(deliver);
+        aucommand.addPackageDelivered(delivered);
     }
     
     public String getType(){

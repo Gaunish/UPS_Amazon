@@ -106,7 +106,9 @@ public class Executor {
     long packageid = delivered.getPackageid();
     updatePackageStatus(packageid, "delivered");
     try{
-    Action deliveryMade = new Delivered(Aconn.getOutputStream(),packageid,amazonseqnum);
+    Action deliveryMade = new AUDeliver(Aconn.getOutputStream(),packageid,amazonseqnum);
+    A_actions.put(amazonseqnum,deliveryMade);
+    amazonseqnum++;
     deliveryMade.sendMessage();
     }catch(Exception e){
       e.printStackTrace();
