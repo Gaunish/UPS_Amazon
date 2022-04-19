@@ -12,6 +12,7 @@ public class AUDeliver implements Action{
     private Command cmd;
     private OutputStream out;
     private UAPackageDelivered.Builder delivered;
+    private long seqnum;
 
   public AUDeliver(OutputStream out, long packageid,long seqnum){
     UAPackageDelivered.Builder delivered = UAPackageDelivered.newBuilder();
@@ -19,6 +20,7 @@ public class AUDeliver implements Action{
     delivered.setSeqnum(seqnum);
     this.delivered = delivered;
     this.out = out;
+    this.seqnum = seqnum;
     
     UACommand.Builder uaCommand = UACommand.newBuilder();
     uaCommand.addPackageDelivered(delivered);
@@ -52,5 +54,9 @@ public class AUDeliver implements Action{
 
     public int getTruckid(){
       return -1;
+    }
+
+    public long getSeqnum(){
+      return seqnum;
     }
 }

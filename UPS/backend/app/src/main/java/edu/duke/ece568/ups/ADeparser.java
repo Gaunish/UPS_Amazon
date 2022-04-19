@@ -42,7 +42,10 @@ public class ADeparser implements Runnable{
                 if(deparser.checkSeqNum(pickup.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
-                
+                try{
+                    exec.execute(pickup);
+                }
+                catch(Exception e){}
             }
         }
 
@@ -65,12 +68,22 @@ public class ADeparser implements Runnable{
                 if(deparser.checkSeqNum(err.getErrorSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                try{
+                    exec.execute(err);
+                }
+                catch(Exception e){}
+    
             }
         }
 
         if(resp.getAcksCount() > 0){
             for(long ack : resp.getAcksList()){
                 //deparse acks
+                try{
+                    exec.execute(ack, false);
+                }
+                catch(Exception e){}
+    
             }
         }
     }

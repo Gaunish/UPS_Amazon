@@ -3,31 +3,29 @@ package edu.duke.ece568.ups;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.io.IOException;
-import edu.duke.ece568.ups.AmazonUps.UACommand;
-import edu.duke.ece568.ups.AmazonUps.UAIsAssociated;
+import edu.duke.ece568.ups.AmazonUps.*;
 import edu.duke.ece568.ups.WorldUps.UCommands;
 
-public class AUassoc implements Action {
+public class AUError implements Action{
     private Command cmd;
     private OutputStream out;
+    private Err.Builder err;
     private long seqnum;
-    private UAIsAssociated.Builder assoc;
-
-  public AUassoc(OutputStream out, long packageid,boolean ismatched,long seqnum){
-    this.seqnum = seqnum;
-    this.out = out;
-
-    UAIsAssociated.Builder isAssociated = UAIsAssociated.newBuilder();
-    isAssociated.setPackageid(packageid);
-    isAssociated.setCheckResult(ismatched);
-    this.assoc = isAssociated;
-    UACommand.Builder uaCommand = UACommand.newBuilder();
-    uaCommand.addLinkResult(isAssociated);
-
-    this.cmd = new Command(out,uaCommand.build(),seqnum);
     
-  }
-    
+    public AUError(OutputStream out, long originno,long seqnum, String str){
+        this.seqnum = seqnum;
+        this.out = out;
+        
+        UACommand.Builder uacmd = UACommand.newBuilder();
+        Err.Builder e = Err.newBuilder();
+        e.setErrorInfo(str);
+        e.setOriginSeqnum(originno);
+        e.setErrorSeqnum(seqnum);
+        uacmd.addError(e);
+
+        this.cmd = new Command(out, uacmd.build(), seqnum); 
+    }
+
     public void sendMessage() throws IOException{
         cmd.sendMessage();
     }
@@ -45,11 +43,11 @@ public class AUassoc implements Action {
     }
 
     public void append(UACommand.Builder aucommand){
-        aucommand.addLinkResult(assoc);
+        aucommand.addError(err);
     }
     
     public String getType(){
-      return "AUAssoc";
+      return "AUError";
     }
 
     public int getTruckid(){

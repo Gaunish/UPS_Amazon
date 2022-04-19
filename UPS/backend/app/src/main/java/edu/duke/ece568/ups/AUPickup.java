@@ -16,10 +16,12 @@ public class AUPickup implements Action{
     private OutputStream out;
     private UAReadyForPickup.Builder pickup;
     private int truck_id;
+    private long seqnum;
 
     public AUPickup(OutputStream out, Database db, int truckid, long seqnum){
       this.truck_id = truckid;
       this.out = out;
+      this.seqnum = seqnum;
 
       int whid = get_whid(truckid, db);
       if(whid == -1){
@@ -87,5 +89,9 @@ public class AUPickup implements Action{
 
     public int getTruckid(){
       return truck_id;
+    }
+
+    public long getSeqnum(){
+      return seqnum;
     }
 }

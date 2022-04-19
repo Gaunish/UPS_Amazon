@@ -19,7 +19,8 @@ public class Executor {
     ClientConnection WConn, Aconn;
   //volatile: any change made to this variable will be visible immediately in all threads
   public volatile long worldseqnum,amazonseqnum;
-    ConcurrentHashMap<Long,Action> W_actions, A_actions; 
+    ConcurrentHashMap<Long,Action> W_actions, A_actions;
+    private AUError auError; 
 
   public Executor(Database db, ClientConnection WConn, ClientConnection AConn, ConcurrentHashMap<Long,Action> W_actions, ConcurrentHashMap<Long,Action> A_actions, long wseq, long aseq){
         this.db = db;
@@ -49,7 +50,7 @@ public class Executor {
 
   private void UpdatePackageTable(int whid, long packageid, int x, int y, String username) {
     // query truck status
-    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\';";
+    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
     ResultSet truckstatus = db.SelectStatement(sql);
     int truckid;
     try {
@@ -108,6 +109,10 @@ public class Executor {
 
           db.executeStatement(q1, "failure");
           db.executeStatement(q2, "failure");
+
+          //update status of truck
+          String update = "UPDATE TRUCK SET STATUS = \'ARRIVE WAREHOUSE\' WHERE TRUCK_ID = " + truck_id + ";";
+    
         }
     }
 
@@ -191,7 +196,7 @@ public class Executor {
   public void execute(UErr err) throws IOException {
     long origin_seqno = err.getOriginseqnum();
     long err_seqno = err.getSeqnum();
-    Action a = A_actions.get(origin_seqno);
+    Action a = W_actions.get(origin_seqno);
     int truck_id = a.getTruckid();
 
     if(a.getType() == "Pickup"){
@@ -204,10 +209,35 @@ public class Executor {
       String update = "UPDATE TRUCK SET STATUS = \'IDLE\' WHERE TRUCK_ID = " + truck_id + ";";
       db.executeStatement(update, "failure");
 
+      //send error back to amazon
+      for(Action action : A_actions.values()){
+        if(action.getTruckid() == truck_id && action.getType() == "AUPickup"){
+          long seqnum = action.getSeqnum();
+          String str = "Truck not arriving at warehouse";
+          AUError auError = new AUError(Aconn.getOutputStream(), seqnum, amazonseqnum, str);
+          auError.sendMessage();
+          A_actions.put(amazonseqnum,auError);
+          amazonseqnum++;
+          break;
+        }
+      }
+
     }
     else if(a.getType() == "Deliver"){
       String update = "UPDATE TRUCK SET STATUS = \'ARRIVE WAREHOUSE\' WHERE TRUCK_ID = " + truck_id + ";";
       db.executeStatement(update, "failure");
+    }
+  }
+
+  //Acks
+  public void execute(long acks, Boolean isWorld) throws IOException{
+    if(isWorld){
+      Action a = W_actions.get(acks);
+      a.setAck();
+    }
+    else{
+      Action a = A_actions.get(acks);
+      a.setAck();
     }
   }
 
