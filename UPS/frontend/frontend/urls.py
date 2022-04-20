@@ -21,4 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('', views.index, name="index"),
+    path('search_results', views.results, name="search_results"),
+    path('package_detail', views.package_detail, name="package_detail"),
 ]

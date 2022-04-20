@@ -1,0 +1,23 @@
+{% extends  'base.html' %}
+{% block main %}
+<div class = "table_header"><h3>Package Detail</h3></div>  
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Package ID</th>
+                <th>Description</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in products %}
+            <tr>
+                <td>{{ item.package_id}}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.count}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
