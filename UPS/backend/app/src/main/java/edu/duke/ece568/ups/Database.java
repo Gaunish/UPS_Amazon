@@ -1,11 +1,9 @@
 package edu.duke.ece568.ups;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 public class Database {
     private Connection c;
@@ -17,7 +15,7 @@ public class Database {
     public void connectDB(){
         try {
             Class.forName("org.postgresql.Driver");
-            c = DriverManager.getConnection("jdbc:postgresql://db:5432/postgres?sslmode=disable","postgres", "1234");
+            c = DriverManager.getConnection("jdbc:postgresql://isilo.db.elephantsql.com:5432/wbejxhle?sslmode=disable","wbejxhle", "q8IrlFX_Ch3EoHJoIM06Mbro5a3EJQlb");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
