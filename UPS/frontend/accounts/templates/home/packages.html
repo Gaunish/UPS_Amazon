@@ -1,0 +1,15 @@
+<!doctype  html>
+<html  lang="en">
+<head>
+<link  rel="stylesheet"  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"  crossorigin="anonymous">
+<title>Welcome</title>
+</head>
+<body>
+  <div  class="container">
+      {%for package in packages %}
+        <h2><a href = {%url 'package' id=package.package_id %}>package.package_id</h2><br>
+        <h2>package.status</h2><br>
+      {% endfor %}
+  </div>
+</body>
+</html>

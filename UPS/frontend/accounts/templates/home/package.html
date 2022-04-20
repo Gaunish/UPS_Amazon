@@ -1,0 +1,19 @@
+<!doctype  html>
+<html  lang="en">
+<head>
+<link  rel="stylesheet"  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"  crossorigin="anonymous">
+<title>Welcome</title>
+</head>
+<body>
+  <div  class="container">
+        <h1>package.x</h1><br>
+        <h1>package.y</h1><br>
+        <h1>package.status</h1><br><br>
+        {%for product in products %}
+        <h3>product.product_id</h3><br>
+        <h3>product.description</h3><br>
+        <h3>product.count</h3><br>
+        {% endfor %}
+  </div>
+</body>
+</html>
