@@ -148,7 +148,7 @@ public class Executor {
   }
        
   private void AssociateUPSAccount(long packageid,String username) {
-    String sql = "SELECT COUNT(*) FROM USERS WHERE USERNAME = "+username+";";
+    String sql = "SELECT COUNT(*) FROM AUTH_USER WHERE USERNAME = "+username+";";
     try{
     ResultSet rs =db.SelectStatement(sql);
     boolean ismatched;

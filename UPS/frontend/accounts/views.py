@@ -1,21 +1,13 @@
 from django.shortcuts import render, redirect
-from .forms import NewUserForm
+from .forms import NewUserForm, ChangeLocationForm
 from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Package, Product, Truck
-
+from .models import Package, Product
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
-#function to check whether user is logged in
-def login_required(request):
-   user = request.session.get('name', "None")
-
-   if user == "None":
-       return False
-   
-   return True
-
-
+# function to check whether user is logged in
 
 
 def register_request(request):
@@ -24,9 +16,6 @@ def register_request(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-           
-            request.session['name'] = form.cleaned_data['username']
-
             messages.success(request, "Registration successful.")
             return redirect("home")
         messages.error(
@@ -34,20 +23,28 @@ def register_request(request):
     form = NewUserForm()
     return render(request=request, template_name="registration/register.html", context={"register_form": form})
 
+
+@login_required
 def view_packages(request):
-    if(login_required(request) == False):
-        return
+    current_user = User.objects.get(pk=request.user.id)
     try:
-        packages = Package.objects.filter(user_name = request.session['name'])
+        packages = Package.objects.filter(user_name=current_user.username)
     except:
         return render(request, "home/error.html")
-    
 
     return render(request, "home/packages.html", {"packages": list(packages)})
 
+
+@login_required
 def package(request, id):
-    if(login_required(request) == False):
-        return
-    pack = Package.objects.get(package_id = id)
-    products = Product.objects.filter(package = pack)
-    return render(request, "home/package.html", {"package": pack, "products": list(products)})
+    if request.method == "GET":
+        pack = Package.objects.get(package_id=id)
+        products = Product.objects.filter(package=pack)
+        return render(request, "home/package.html", {"package": pack, "products": list(products)})
+
+    form = ChangeLocationForm(request.POST)
+    if form.is_valid():
+        newx = form.cleaned_data['x']
+        newy = form.cleaned_data['y']
+        Package.objects.filter(package_id=id).update(x=newx, y=newy)
+        return redirect("home")

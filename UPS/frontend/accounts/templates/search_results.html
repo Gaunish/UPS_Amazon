@@ -14,16 +14,14 @@
         </thead>
 
         <tbody>
-          {%for package in packages %}
             <tr>
                 <td>{{ package.package_id}}</td>
                 <td>{{ package.x }}</td>
                 <td>{{ package.y }}</td>
                 <td>{{ package.truck_id }}</td>
                 <td>{{package.status}}</td>
-                <td><a href = {%url 'package' id=package.package_id %}>View Detail</a></td>
+                <td><a href ="{% url 'package_detail' %}?id={{package.package_id}}">View Detail</a></td>
             </tr>
-            {%endfor%}
         </tbody>
     </table>
-    {% endblock %}
+{% endblock %}
