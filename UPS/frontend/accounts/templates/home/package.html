@@ -5,15 +5,15 @@
 <title>Welcome</title>
 </head>
 <body>
-  <div  class="container">
-        <h1>package.x</h1><br>
-        <h1>package.y</h1><br>
-        <h1>package.status</h1><br><br>
+        <h3>{{package.x}}</h3><br>
+        <h3>{{package.y}}</h3><br>
+        <h3>{{package.status}}</h3><br><br>
         {%for product in products %}
-        <h3>product.product_id</h3><br>
-        <h3>product.description</h3><br>
-        <h3>product.count</h3><br>
+        <div  class="container">
+          {{product.product_id}}<br>
+          {{product.description}}<br>
+          {{product.count}}<br>
+        </div>
         {% endfor %}
-  </div>
 </body>
 </html>

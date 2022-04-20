@@ -5,11 +5,11 @@
 <title>Welcome</title>
 </head>
 <body>
+  {%for package in packages %}
   <div  class="container">
-      {%for package in packages %}
-        <h2><a href = {%url 'package' id=package.package_id %}>package.package_id</h2><br>
-        <h2>package.status</h2><br>
-      {% endfor %}
+        <h2><a href = {%url 'package' id=package.package_id %}>{{package.package_id}}</h2></a><br>
+        <h2>{{package.status}}</h2><br>
   </div>
+  {% endfor %}
 </body>
 </html>

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import NewUserForm
 from django.contrib.auth import login
 from django.contrib import messages
+from .models import Package, Product, Truck
 
 # Create your views here.
 
@@ -27,7 +28,7 @@ def register_request(request):
             request.session['name'] = form.cleaned_data['username']
 
             messages.success(request, "Registration successful.")
-            return redirect("login")
+            return redirect("home")
         messages.error(
             request, "Unsuccessful registration. Invalid information.")
     form = NewUserForm()
@@ -36,13 +37,17 @@ def register_request(request):
 def view_packages(request):
     if(login_required(request) == False):
         return
+    try:
+        packages = Package.objects.filter(user_name = request.session['name'])
+    except:
+        return render(request, "home/error.html")
+    
 
-    packages = Package.objects.get(user_name = request.session['name'])
-    return render(request, "home/packages.html", {"packages": packages})
+    return render(request, "home/packages.html", {"packages": list(packages)})
 
 def package(request, id):
     if(login_required(request) == False):
         return
     pack = Package.objects.get(package_id = id)
-    products = Product.objects.get(package = pack)
-    return render(request, "home/package.html", {"package": pack, "products": products})
+    products = Product.objects.filter(package = pack)
+    return render(request, "home/package.html", {"package": pack, "products": list(products)})

@@ -10,15 +10,6 @@ from django import forms
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
-class Users(models.Model):
-    user_id = models.AutoField(primary_key=True)
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=128)
-
-    class Meta:
-        managed = True
-        db_table = 'users'
-
 class Package(models.Model):
     package_id = models.BigIntegerField(primary_key=True)
     x = models.IntegerField()
