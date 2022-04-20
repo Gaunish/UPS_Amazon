@@ -59,4 +59,12 @@ public class Pickup implements Action{
     public String getType(){
       return "Pickup";
     }
+
+    public int getTruckid(){
+      return truckid;
+    }
+    public long getSeqnum(){
+      return seqnum;
+    }
+
 }

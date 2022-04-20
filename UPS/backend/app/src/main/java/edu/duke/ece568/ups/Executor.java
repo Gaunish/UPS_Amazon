@@ -11,13 +11,16 @@ import edu.duke.ece568.ups.AmazonUps.AURequestPickup;
 import edu.duke.ece568.ups.AmazonUps.Err;
 import edu.duke.ece568.ups.WorldAmazon.APack;
 import edu.duke.ece568.ups.WorldAmazon.AProduct;
+import edu.duke.ece568.ups.AmazonUps.*;
+import edu.duke.ece568.ups.WorldUps.*;
 
 public class Executor {
     Database db;
     ClientConnection WConn, Aconn;
   //volatile: any change made to this variable will be visible immediately in all threads
   public volatile long worldseqnum,amazonseqnum;
-    ConcurrentHashMap<Long,Action> W_actions, A_actions; 
+    ConcurrentHashMap<Long,Action> W_actions, A_actions;
+    private AUError auError; 
 
   public Executor(Database db, ClientConnection WConn, ClientConnection AConn, ConcurrentHashMap<Long,Action> W_actions, ConcurrentHashMap<Long,Action> A_actions, long wseq, long aseq){
         this.db = db;
@@ -47,7 +50,7 @@ public class Executor {
 
   private void UpdatePackageTable(int whid, long packageid, int x, int y, String username) {
     // query truck status
-    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\';";
+    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
     ResultSet truckstatus = db.SelectStatement(sql);
     int truckid;
     try {
@@ -94,13 +97,56 @@ public class Executor {
         //String update_q = "UPDATE TRUCK SET STATUS = ";
     }
 
+    //amazon error
     public void execute(Err errA) throws IOException {
         long origin_seqno = errA.getOriginSeqnum();
         long err_seqno = errA.getErrorSeqnum();
         Action a = A_actions.get(origin_seqno);
-    }
-       
+        int truck_id = a.getTruckid();
+        if(a.getType() == "AUPickup"){
+          String q1 = "DELETE FROM PRODUCT WHERE PACKAGE_ID IN (SELECT PACKAGE_ID FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\');";
+          String q2 = "DELETE FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
 
+          db.executeStatement(q1, "failure");
+          db.executeStatement(q2, "failure");
+
+          //update status of truck
+          String update = "UPDATE TRUCK SET STATUS = \'ARRIVE WAREHOUSE\' WHERE TRUCK_ID = " + truck_id + ";";
+    
+        }
+    }
+
+  public void execute(UDeliveryMade delivered){
+    long packageid = delivered.getPackageid();
+    updatePackageStatus(packageid, "delivered");
+    try{
+    Action deliveryMade = new AUDeliver(Aconn.getOutputStream(),packageid,amazonseqnum);
+    A_actions.put(amazonseqnum,deliveryMade);
+    amazonseqnum++;
+    deliveryMade.sendMessage();
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+  }
+
+  public void execute(UTruck truckstatus){
+    int truckid = truckstatus.getTruckid();
+    String status = truckstatus.getStatus();
+    int x = truckstatus.getX();
+    int y = truckstatus.getY();
+    updateTruckStatus(truckid, status,x,y);
+  }
+
+  private void updatePackageStatus(long packageid,String status){
+    String sql = "UPDATE PACKAGE SET STATUS = '"+status+"' WHERE PACKAGE_ID = "+packageid+";";
+    db.executeStatement(sql, "failure");
+  }
+
+  private void updateTruckStatus(int truckid,String status,int x, int y){
+    String sql = "UPDATE TRUCK SET STATUS = '"+status+"', X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
+    db.executeStatement(sql, "failure");
+  }
+       
   private void AssociateUPSAccount(long packageid,String username) {
     String sql = "SELECT COUNT(*) FROM USERS WHERE USERNAME = "+username+";";
     try{
@@ -118,6 +164,80 @@ public class Executor {
     isAssociated.sendMessage();
     }catch(Exception e){
       e.printStackTrace();
+    }
+  }
+
+  public void execute(UFinished completions) throws IOException {
+    int truck_id = completions.getTruckid();
+    String status = completions.getStatus();
+     
+    String new_status = "";
+
+    //Pickup request
+    if(status.equals("arrive warehouse")){
+      new_status = "loading";
+
+      //send notification to amazon
+      Action pickupReady = new AUPickup(Aconn.getOutputStream(), db, truck_id, amazonseqnum); 
+      A_actions.put(amazonseqnum,pickupReady);
+      amazonseqnum++;
+      pickupReady.sendMessage();
+    }
+    else{
+      new_status = "idle";
+    }
+
+    //Update truck status
+    String update = "UPDATE TRUCK SET STATUS = \'" + new_status + "\' WHERE TRUCK_ID = " + truck_id + ";";
+    db.executeStatement(update, "failure");
+  }
+
+  //World error
+  public void execute(UErr err) throws IOException {
+    long origin_seqno = err.getOriginseqnum();
+    long err_seqno = err.getSeqnum();
+    Action a = W_actions.get(origin_seqno);
+    int truck_id = a.getTruckid();
+
+    if(a.getType() == "Pickup"){
+      String q1 = "DELETE FROM PRODUCT WHERE PACKAGE_ID IN (SELECT PACKAGE_ID FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\');";
+      String q2 = "DELETE FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+
+      db.executeStatement(q1, "failure");
+      db.executeStatement(q2, "failure");
+
+      String update = "UPDATE TRUCK SET STATUS = \'IDLE\' WHERE TRUCK_ID = " + truck_id + ";";
+      db.executeStatement(update, "failure");
+
+      //send error back to amazon
+      for(Action action : A_actions.values()){
+        if(action.getTruckid() == truck_id && action.getType() == "AUPickup"){
+          long seqnum = action.getSeqnum();
+          String str = "Truck not arriving at warehouse";
+          AUError auError = new AUError(Aconn.getOutputStream(), seqnum, amazonseqnum, str);
+          auError.sendMessage();
+          A_actions.put(amazonseqnum,auError);
+          amazonseqnum++;
+          break;
+        }
+      }
+
+    }
+    else if(a.getType() == "Deliver"){
+      String update = "UPDATE TRUCK SET STATUS = \'ARRIVE WAREHOUSE\' WHERE TRUCK_ID = " + truck_id + ";";
+      db.executeStatement(update, "failure");
+    }
+  }
+
+  //Acks
+  public void execute(long acks, Boolean isWorld) throws IOException{
+    if(isWorld){
+      Action a = W_actions.get(acks);
+      a.setAck();
+    }
+    else{
+      Action a = A_actions.get(acks);
+      a.setAck();
     }
   }
 

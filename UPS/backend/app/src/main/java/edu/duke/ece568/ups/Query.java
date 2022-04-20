@@ -61,4 +61,11 @@ public class Query implements Action{
     public String getType(){
       return "Query";
     }
+
+    public int getTruckid(){
+      return truckid;
+    }
+    public long getSeqnum(){
+      return seqnum;
+    }
 }

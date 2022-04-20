@@ -25,7 +25,7 @@ message AUConnected{
 
 message UAReadyForPickup{
 	required int32 whnum = 1;
-    repeated AUPack packages = 2;
+    repeated int64 packageid = 2;
 	required int32 truckid = 3;
 	required int64 seqnum = 4;
 };

@@ -10,9 +10,13 @@ import edu.duke.ece568.ups.WorldUps.UCommands;
 public class AUassoc implements Action {
     private Command cmd;
     private OutputStream out;
+    private long seqnum;
     private UAIsAssociated.Builder assoc;
 
   public AUassoc(OutputStream out, long packageid,boolean ismatched,long seqnum){
+    this.seqnum = seqnum;
+    this.out = out;
+
     UAIsAssociated.Builder isAssociated = UAIsAssociated.newBuilder();
     isAssociated.setPackageid(packageid);
     isAssociated.setCheckResult(ismatched);
@@ -46,5 +50,13 @@ public class AUassoc implements Action {
     
     public String getType(){
       return "AUAssoc";
+    }
+
+    public int getTruckid(){
+      return -1;
+    }
+
+    public long getSeqnum(){
+      return seqnum;
     }
 }

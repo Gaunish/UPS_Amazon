@@ -15,11 +15,13 @@ public class WDeparser implements Runnable{
     HashSet<Long> recvSeq;
     ClientConnection conn;
     Deparser deparser;
+    Executor executor;
 
-    public WDeparser(ClientConnection conn, BlockingQueue<UResponses.Builder> queue, Database db){
+    public WDeparser(Executor e, ClientConnection conn, BlockingQueue<UResponses.Builder> queue, Database db){
         this.queue = queue;
         this.db = db;
         this.conn = conn;
+        this.executor = e;
 
         ackList = new ArrayList<>();
         recvSeq = new HashSet<>();
@@ -33,7 +35,10 @@ public class WDeparser implements Runnable{
                 if(deparser.checkSeqNum(comp.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
-                //executor.execute(comp);
+                try{
+                    executor.execute(comp);
+                }
+                catch(Exception e){}
             }
         }
 
@@ -43,6 +48,10 @@ public class WDeparser implements Runnable{
                 if(deparser.checkSeqNum(deliver.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                try{
+                    executor.execute(deliver);
+                }
+                catch(Exception e){}
             }
         }
 
@@ -52,6 +61,10 @@ public class WDeparser implements Runnable{
                 if(deparser.checkSeqNum(truck.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                try{
+                    executor.execute(truck);
+                }
+                catch(Exception e){}
             }
         }
 
@@ -61,11 +74,28 @@ public class WDeparser implements Runnable{
                 if(deparser.checkSeqNum(err.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
+                try{
+                    executor.execute(err);
+                }
+                catch(Exception e){}
+                
+            }
+        }
+
+        if(resp.getAcksCount() > 0){
+            for(long acks : resp.getAcksList()){
+                //deparse acks
+                try{
+                    executor.execute(acks, true);
+                }
+                catch(Exception e){}
+    
             }
         }
 
         if(resp.hasFinished()){
             boolean finished = resp.getFinished();
+            //TODO : Implement finished
         }
     }
 
