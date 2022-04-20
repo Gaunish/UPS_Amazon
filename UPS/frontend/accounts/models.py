@@ -17,7 +17,7 @@ class Package(models.Model):
     status = models.CharField(max_length=25)
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'package'
 
 
@@ -30,43 +30,3 @@ class Product(models.Model):
     class Meta:
         managed = False
         db_table = 'product'
-
-
-class Package(models.Model):
-    package_id = models.BigIntegerField(primary_key=True)
-    x = models.IntegerField()
-    y = models.IntegerField()
-    truck_id = models.IntegerField()
-    user_name = models.CharField(max_length=100)
-    status = models.CharField(max_length=25)
-
-    class Meta:
-        managed = False
-<<<<<<< HEAD
-        db_table = 'users'
-=======
-        db_table = 'package'
-
-
-class Product(models.Model):
-    product_id = models.AutoField(primary_key=True)
-    package = models.ForeignKey(Package, models.DO_NOTHING)
-    description = models.CharField(max_length=200, blank=True, null=True)
-    count = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'product'
-
-
-class Truck(models.Model):
-    truck_id = models.IntegerField(primary_key=True)
-    whid = models.IntegerField()
-    status = models.CharField(max_length=20)
-    x = models.IntegerField()
-    y = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'truck'
->>>>>>> cd8bf8b05200e73e838a8d0e51a9a4549bced70a
