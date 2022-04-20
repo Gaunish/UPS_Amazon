@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import edu.duke.ece568.ups.WorldAmazon.AConnect;
@@ -25,16 +26,36 @@ import edu.duke.ece568.ups.AmazonUps.AUCommand;
 import edu.duke.ece568.ups.AmazonUps.UACommand;   
 
 public class App {
-  public static void UWsendAck(ArrayList<Long> acks,OutputStream out) {
-    UCommands.Builder uCommand = UCommands.newBuilder();
-    for (int i = 0; i < acks.size(); i++) {
-      uCommand.addAcks(acks.get(i));
-    }
-    MessageTransmitter.sendMsgTo(uCommand.build(), out);
+  private static BlockingQueue<UResponses.Builder> worldQueue;
+  private static BlockingQueue<AUCommand.Builder> amazonQueue;
+  private static long worldId;
+  private static ConcurrentHashMap<Long,Action>worldActions, amazonActions;
+  private static ClientConnection amazonConnection, worldConnection;
+  private static Database db;
+  private static volatile long worldSeqno, amznSeqno;
+  private static Executor executor;
+
+  private static void init(){
+    worldQueue = new LinkedBlockingQueue<UResponses.Builder>(100);
+    amazonQueue = new LinkedBlockingQueue<AUCommand.Builder>(100);
+    worldActions = new ConcurrentHashMap<>();
+    amazonActions = new ConcurrentHashMap<>();
+    worldSeqno = 0;
+    amznSeqno = 0;
+    db = new Database();
+  }
+
+  private static void connect() throws IOException{
+    db.connectDB();
+    worldConnection = new ClientConnection("172.18.0.1", 12345);
+    amazonConnection = new ClientConnection("172.18.0.1", 6666);
+    executor = new Executor(db, worldConnection, amazonConnection, worldActions, amazonActions, worldSeqno, amznSeqno);
+    
+    //init for ups side - initialize 100 trucks and create a new world
+    worldId = initWorld(db, worldConnection.getInputStream(),worldConnection.getOutputStream());
   }
 
   public static long initWorld(Database db,InputStream in,OutputStream out) {
-
     UConnect.Builder connect = UConnect.newBuilder();
     connect.setIsAmazon(false);
     String sql = "";
@@ -49,55 +70,50 @@ public class App {
     MessageTransmitter.sendMsgTo(connect.build(), out);
     UConnected.Builder resp = UConnected.newBuilder();
     MessageTransmitter.recvMsgFrom(resp,in);
-    System.out.println("world id: " + resp.getWorldid());
-    System.out.println("result: " + resp.getResult());
+    //System.out.println("world id: " + resp.getWorldid());
+    //System.out.println("result: " + resp.getResult());
     db.executeStatement(sql, "Error");
     return resp.getWorldid();
   }
 
-  public static void main(String[] args) throws IOException, InterruptedException {
-    long worldid;
-    HashMap<Long,Action>worldActions = new HashMap<Long,Action>();
-    BlockingQueue<UResponses.Builder> queue = new LinkedBlockingQueue<UResponses.Builder>(30);
-    ClientConnection worldConnection = new ClientConnection("172.18.0.1", 12345);
-    UWReceiver listener = new UWReceiver(queue, worldConnection.getInputStream());
-    Thread t = new Thread(listener);
-
-    //Connect to database
-    Database database = new Database(); 
-    database.connectDB();
-
-    //Amazon Listening,sending queue
-    BlockingQueue<AUCommand.Builder> amzn_recv = new LinkedBlockingQueue<AUCommand.Builder>(50);
-    /*ClientConnection amznConnection = new ClientConnection("vcm-25935.vm.duke.edu", 6666);
-    UAListener amzn_listen = new UAListener(amzn_recv, amznConnection.getInputStream());
-    Thread amzn = new Thread(amzn_listen);*/
-
-    //init for ups side - initialize 100 trucks and create a new world
-    worldid = initWorld(database, worldConnection.getInputStream(),worldConnection.getOutputStream());
-
-    //Mock Amazon
-    ClientConnection WAConnection = new ClientConnection("172.18.0.1", 23456);
+  private static void connectAmazon() throws IOException{
     AConnect.Builder Aconnect = AConnect.newBuilder();
-    Aconnect.setWorldid(worldid);
-    Aconnect.setIsAmazon(true);
-    for(int i=1;i<5;i++){
-    AInitWarehouse.Builder warehouse1 = AInitWarehouse.newBuilder();
-    warehouse1.setId(i);
-    warehouse1.setX(5+i);
-    warehouse1.setY(5+i);  
-    
-    Aconnect.addInitwh(warehouse1);
-    }
-
-    //Executor executorA = new Executor(db, connA);
-    //Executor executorW = new Executor(db, connW);
-
-    MessageTransmitter.sendMsgTo(Aconnect.build(), WAConnection.getOutputStream());
+    Aconnect.setWorldid(worldId);
+    MessageTransmitter.sendMsgTo(Aconnect.build(), amazonConnection.getOutputStream());
     AConnected.Builder aconnected = AConnected.newBuilder();
-    MessageTransmitter.recvMsgFrom(aconnected, WAConnection.getInputStream());
-    System.out.println("worldID: " + aconnected.getWorldid());
-    System.out.println("result: " + aconnected.getResult());
-  
+    MessageTransmitter.recvMsgFrom(aconnected, amazonConnection.getInputStream());
+    //System.out.println("worldID: " + aconnected.getWorldid());
+    //System.out.println("result: " + aconnected.getResult());
+  }
+
+  private static void run() throws IOException{
+    //World deparser
+    WDeparser world_deparser = new WDeparser(executor, worldConnection, worldQueue, db);
+    Thread world_d = new Thread(world_deparser);
+    world_d.start();
+
+    //Amazon deparser
+    ADeparser amzn_deparser = new ADeparser(executor, amazonConnection, amazonQueue, db);
+    Thread world_a = new Thread(amzn_deparser);
+    world_a.start();
+
+    
+    //World listening queue
+    UWReceiver world_listener = new UWReceiver(worldQueue, worldConnection.getInputStream());
+    Thread world_l = new Thread(world_listener);
+    world_l.start();
+
+    //Amazon Listening queue
+    UAListener amzn_listen = new UAListener(amazonQueue, amazonConnection.getInputStream());
+    Thread amzn_l = new Thread(amzn_listen);
+    amzn_l.start();
+
+  }
+
+  public static void main(String[] args) throws IOException, InterruptedException {
+    init();
+    connect();
+    connectAmazon();
+    run();
   }
 }

@@ -95,6 +95,7 @@ public class WDeparser implements Runnable{
 
         if(resp.hasFinished()){
             boolean finished = resp.getFinished();
+            //TODO : Implement finished
         }
     }
 
