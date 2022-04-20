@@ -14,4 +14,5 @@ urlpatterns = [
          name='password_change'),
     path('password-reset/done/', views.PasswordResetDoneView.as_view(),
          name='password_reset_done'),
+    #path('package/<int:id>', custom_views.package, name = "package"),
 ]

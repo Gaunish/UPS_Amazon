@@ -80,10 +80,10 @@ WSGI_APPLICATION = 'frontend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ups',
-        'USER': 'postgres',
-        'PASSWORD': 'passw0rd',
-        'HOST': 'localhost',
+        'NAME': 'wbejxhle',
+        'USER': 'wbejxhle',
+        'PASSWORD': 'q8IrlFX_Ch3EoHJoIM06Mbro5a3EJQlb',
+        'HOST': 'isilo.db.elephantsql.com',
         'PORT': '5432'
     }
 
