@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import NewUserForm
+from .forms import NewUserForm, ChangeLocationForm
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -35,11 +35,16 @@ def view_packages(request):
     return render(request, "home/packages.html", {"packages": list(packages)})
 
 
-'''
+@login_required
 def package(request, id):
-    if(login_required(request) == False):
-        return
-    pack = Package.objects.get(package_id = id)
-    products = Product.objects.filter(package = pack)
-    return render(request, "home/package.html", {"package": pack, "products": list(products)})
-'''
+    if request.method == "GET":
+        pack = Package.objects.get(package_id=id)
+        products = Product.objects.filter(package=pack)
+        return render(request, "home/package.html", {"package": pack, "products": list(products)})
+
+    form = ChangeLocationForm(request.POST)
+    if form.is_valid():
+        newx = form.cleaned_data['x']
+        newy = form.cleaned_data['y']
+        Package.objects.filter(package_id=id).update(x=newx, y=newy)
+        return redirect("home")

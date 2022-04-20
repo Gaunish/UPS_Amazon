@@ -5,6 +5,9 @@
 <title>Welcome</title>
 </head>
 <body>
+        {%if package.status ='open'%}
+        form.as_view()
+        {%endif%}
         <h3>{{package.x}}</h3><br>
         <h3>{{package.y}}</h3><br>
         <h3>{{package.status}}</h3><br><br>

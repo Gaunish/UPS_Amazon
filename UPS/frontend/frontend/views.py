@@ -15,7 +15,7 @@ def results(request):
     if not packageid:
         return render(request, 'error.html')
     try:
-        package_result = Package.objects.get(package_id=packageid)
+        package_result = Package.objects.filter(package_id=packageid)
     except:
         return render(request, 'error.html')
     return render(request, 'search_results.html', {'package': package_result})
