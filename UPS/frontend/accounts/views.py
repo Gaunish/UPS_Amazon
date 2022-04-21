@@ -40,7 +40,8 @@ def package(request, id):
     if request.method == "GET":
         pack = Package.objects.get(package_id=id)
         products = Product.objects.filter(package=pack)
-        return render(request, "home/package.html", {"package": pack, "products": list(products)})
+        form = ChangeLocationForm()
+        return render(request, "home/package.html", {"package": pack, "products": list(products), "form": form})
 
     form = ChangeLocationForm(request.POST)
     if form.is_valid():
