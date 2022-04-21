@@ -4,7 +4,7 @@ from . import views as custom_views
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
+    path('logout/', views.LogoutView.as_view(template_name='registration/logged_out.html'), name='logout'),
     path("register/", custom_views.register_request, name="register"),
     path('password-reset/', views.PasswordResetView.as_view(),
          name='password_reset'),
