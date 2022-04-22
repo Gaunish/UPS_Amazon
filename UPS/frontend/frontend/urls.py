@@ -26,4 +26,5 @@ urlpatterns = [
     path('package_detail', views.package_detail, name="package_detail"),
     path('home/', custom_views.view_packages, name="home"),
     path('search', views.search, name="search"),
+    path('django_plotly_dash/', include('django_plotly_dash.urls')),
 ]
