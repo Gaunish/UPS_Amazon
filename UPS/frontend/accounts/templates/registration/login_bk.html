@@ -1,0 +1,31 @@
+{% extends  'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    .login_form{
+        width:300px;
+        height:600px;
+        position: fixed;
+        top: 30%;
+        left: 50%;
+        margin-top: -120px;
+        margin-left: -180px;
+    }
+</style>
+<div class=login_form>
+<div class="card">
+<div class="card-body">
+<h4 class="card-title">Log in to your account</h4>
+<form method="post">
+{% csrf_token %}
+<input type="hidden" name="next" value="{{ next }}">
+
+{{ form|crispy }}
+
+<button type="submit" class="btn btn-primary btn-block">Log in</button>
+</form>
+</div>
+</div>
+</div>
+{% endblock %}

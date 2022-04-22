@@ -38,8 +38,8 @@ public class App {
   private static void init(){
     worldQueue = new LinkedBlockingQueue<UResponses.Builder>(100);
     amazonQueue = new LinkedBlockingQueue<AUCommand.Builder>(100);
-    worldActions = new ConcurrentHashMap<>();
-    amazonActions = new ConcurrentHashMap<>();
+    worldActions = new ConcurrentHashMap<Long,Action>();
+    amazonActions = new ConcurrentHashMap<Long,Action>();
     worldSeqno = 0;
     amznSeqno = 0;
     db = new Database();

@@ -1,9 +1,5 @@
-<!doctype  html>
-<html  lang="en">
-<head>
-<link  rel="stylesheet"  href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"  integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"  crossorigin="anonymous">
-<title>Welcome</title>
-</head>
+{% extends  'base.html' %}
+{% block content %}
 <body>
         {%if package.status == 'open'%}
         <form action="" method="post">
@@ -15,12 +11,24 @@
         <h3>{{package.x}}</h3><br>
         <h3>{{package.y}}</h3><br>
         <h3>{{package.status}}</h3><br><br>
-        {%for product in products %}
-        <div  class="container">
-          {{product.product_id}}<br>
-          {{product.description}}<br>
-          {{product.count}}<br>
-        </div>
-        {% endfor %}
-</body>
-</html>
+        <div class = "table_header"><h3>Package Detail</h3></div>  
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Package ID</th>
+                <th>Description</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in products %}
+            <tr>
+                <td>{{ item.package_id}}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.count}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        {% endblock %}

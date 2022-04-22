@@ -1,0 +1,36 @@
+
+{% extends  'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<style>
+  .search{
+      width:500px;
+      height:600px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin-top: -120px;
+      margin-left: -180px;
+  }
+  .search_btn{
+    width:100px;
+    position: fixed;
+    top: 49.5%;
+    left: 67%;
+    margin-top: -120px;
+      margin-left: -180px;
+  }
+</style>
+{% load crispy_forms_tags %}
+<div class=search>
+<form action="{% url 'search_results' %}" method="get">
+  <input name="q" type="text" placeholder="Please enter your package id">
+  {{ form|crispy }}
+  <div class=search_btn>
+  <button type="submit" class="btn btn-primary btn-block">search</button>
+  </div>
+</form>
+</div>
+{% endblock %}

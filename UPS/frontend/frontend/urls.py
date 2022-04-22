@@ -25,4 +25,5 @@ urlpatterns = [
     path('search_results', views.results, name="search_results"),
     path('package_detail', views.package_detail, name="package_detail"),
     path('home/', custom_views.view_packages, name="home"),
+    path('search', views.search, name="search"),
 ]

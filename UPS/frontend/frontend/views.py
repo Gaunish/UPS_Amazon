@@ -10,12 +10,16 @@ def index(request):
     return render(request, 'index.html')
 
 
+def search(request):
+    return render(request, 'search.html')
+
+
 def results(request):
     packageid = request.GET.get("q", 0)
     if not packageid:
         return render(request, 'error.html')
     try:
-        package_result = Package.objects.filter(package_id=packageid)
+        package_result = Package.objects.get(package_id=packageid)
     except:
         return render(request, 'error.html')
     return render(request, 'search_results.html', {'package': package_result})
