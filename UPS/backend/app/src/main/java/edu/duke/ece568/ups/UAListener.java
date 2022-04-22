@@ -16,12 +16,14 @@ public class UAListener implements Runnable{
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
+        System.out.println("Started amazon listener");
         //Forever listening port
         while(true){
             try{
                 AUCommand.Builder recv = AUCommand.newBuilder();
                 if (MessageTransmitter.recvMsgFrom(recv, in)) {
+                    System.out.println("Recieved message from amazon");
                     queue.put(recv);
                 }
             }

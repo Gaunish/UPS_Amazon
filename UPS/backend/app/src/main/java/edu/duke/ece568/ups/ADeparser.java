@@ -1,6 +1,9 @@
 package edu.duke.ece568.ups;
 
 import java.util.concurrent.BlockingQueue;
+
+import javax.swing.plaf.synth.SynthPasswordFieldUI;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.io.IOException;
@@ -38,12 +41,14 @@ public class ADeparser implements Runnable{
     private synchronized void deparse(AUCommand.Builder resp){
         if(resp.getPickupRequestCount() > 0){
             for(AURequestPickup pickup : resp.getPickupRequestList()){
+                System.out.println("Recieved package");
                 //deparse pickup
                 if(deparser.checkSeqNum(pickup.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
                 try{
                     exec.execute(pickup);
+                    System.out.println("Execute package");
                 }
                 catch(Exception e){}
             }

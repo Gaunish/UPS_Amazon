@@ -35,7 +35,7 @@ public class Deliver implements Action{
       String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
       ResultSet res = db.SelectStatement(q);
       try{
-        while(res.next()){
+        while(res != null && res.next()){
           UDeliveryLocation.Builder del = UDeliveryLocation.newBuilder();
           del.setPackageid(res.getLong("PACKAGE_ID"));
           del.setX(res.getInt("X"));
