@@ -22,8 +22,10 @@ import edu.duke.ece568.ups.WorldUps.UConnected;
 import edu.duke.ece568.ups.WorldUps.UInitTruck;
 import edu.duke.ece568.ups.WorldUps.UResponses;
 
-import edu.duke.ece568.ups.AmazonUps.AUCommand;   
-import edu.duke.ece568.ups.AmazonUps.UACommand;   
+import edu.duke.ece568.ups.AmazonUps.AUCommand;
+import edu.duke.ece568.ups.AmazonUps.AUConnected;
+import edu.duke.ece568.ups.AmazonUps.UACommand;
+import edu.duke.ece568.ups.AmazonUps.UAConnect;   
 
 public class App {
   private static BlockingQueue<UResponses.Builder> worldQueue;
@@ -47,12 +49,15 @@ public class App {
 
   private static void connect() throws IOException{
     db.connectDB();
-    worldConnection = new ClientConnection("172.18.0.1", 12345);
+    worldConnection = new ClientConnection("vcm-25935.vm.duke.edu", 12345);
+    System.out.println("Connected to world server");
     amazonConnection = new ClientConnection("172.18.0.1", 6666);
+    System.out.println("Connected to amazon server");
     executor = new Executor(db, worldConnection, amazonConnection, worldActions, amazonActions, worldSeqno, amznSeqno);
     
     //init for ups side - initialize 100 trucks and create a new world
     worldId = initWorld(db, worldConnection.getInputStream(),worldConnection.getOutputStream());
+    System.out.println("World is init");
   }
 
   public static long initWorld(Database db,InputStream in,OutputStream out) {
@@ -64,7 +69,8 @@ public class App {
       truck.setId(i);
       truck.setX(1);
       truck.setY(1);
-      sql+= "INSERT INTO TRUCK VALUES("+i+",1,1,'idle');";
+      sql = "INSERT INTO TRUCK VALUES("+i+", -1, \'idle\', 1, 1);";
+      db.executeStatement(sql, "Error");
       connect.addTrucks(truck);
     }
     MessageTransmitter.sendMsgTo(connect.build(), out);
@@ -72,16 +78,18 @@ public class App {
     MessageTransmitter.recvMsgFrom(resp,in);
     //System.out.println("world id: " + resp.getWorldid());
     //System.out.println("result: " + resp.getResult());
-    db.executeStatement(sql, "Error");
     return resp.getWorldid();
   }
 
   private static void connectAmazon() throws IOException{
-    AConnect.Builder Aconnect = AConnect.newBuilder();
-    Aconnect.setWorldid(worldId);
-    MessageTransmitter.sendMsgTo(Aconnect.build(), amazonConnection.getOutputStream());
-    AConnected.Builder aconnected = AConnected.newBuilder();
-    MessageTransmitter.recvMsgFrom(aconnected, amazonConnection.getInputStream());
+    UAConnect.Builder UAconnect = UAConnect.newBuilder();
+    UAconnect.setWorldid(worldId);
+    UAconnect.setSeqnum(0);
+    System.out.println("Sending connect to amazon");
+    MessageTransmitter.sendMsgTo(UAconnect.build(), amazonConnection.getOutputStream());
+    System.out.println("Sent connect to amazon");
+    AUConnected.Builder auconnected = AUConnected.newBuilder();
+    MessageTransmitter.recvMsgFrom(auconnected, amazonConnection.getInputStream());
     //System.out.println("worldID: " + aconnected.getWorldid());
     //System.out.println("result: " + aconnected.getResult());
   }

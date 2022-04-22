@@ -50,18 +50,19 @@ public class Executor {
 
   private void UpdatePackageTable(int whid, long packageid, int x, int y, String username) {
     // query truck status
-    String sql = "SELECT TRUCK_ID FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
+    String sql = "SELECT * FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
     ResultSet truckstatus = db.SelectStatement(sql);
     int truckid;
     try {
-      if (truckstatus.next()) {
+      if (truckstatus != null && truckstatus.next()) {
         truckid = truckstatus.getInt("truck_id");
       } else {
-        sql = "SELECT TRUCK_ID FROM TABLE TRUCK WHERE STATUS = \'idle\' OR STATUS = \'delivering\' ORDER BY FIELD(STATUS, \'idle\', \'delivering\');";
+        sql = "SELECT * FROM TRUCK WHERE STATUS = \'idle\';";
         ResultSet newtruck = db.SelectStatement(sql);
-        if (newtruck.next()) {
+        if (newtruck != null && newtruck.next()) {
           truckid = newtruck.getInt("truck_id");
-          sql = "UPDATE TRUCK SET STATUS = \'traveling\' AND WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
+          System.out.println("TRUCK_ID : "+ truckid);
+          sql = "UPDATE TRUCK SET STATUS = \'traveling\', WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
           db.executeStatement(sql, "failure");
           Action pickup = new Pickup(WConn.getOutputStream(), truckid, whid, worldseqnum);
           W_actions.put(worldseqnum, pickup);
@@ -69,6 +70,7 @@ public class Executor {
           pickup.sendMessage();
         } else {
           // send error to amazon saying there is no availabel trucks
+          System.out.println("Error in trucks");
           return;
         }
       }
@@ -83,7 +85,7 @@ public class Executor {
   private void insertProducts(long packageid,APack apack){
     List<AProduct> product_list = apack.getThingsList();
     for(AProduct aproduct:product_list){
-      String sql = "INSERT INTO PRODUCT(PACKAGE_ID,DESCRIPTION,COUNT) VALUES("+packageid+", '"+aproduct.getDescription()+"',"+aproduct.getCount()+");";
+      String sql = "INSERT INTO PRODUCT(PACKAGE_ID,DESCRIPTION,COUNT) VALUES("+packageid+", \'"+aproduct.getDescription()+"\',"+aproduct.getCount()+");";
       db.executeStatement(sql,"failure");
     }
   }
@@ -138,12 +140,12 @@ public class Executor {
   }
 
   private void updatePackageStatus(long packageid,String status){
-    String sql = "UPDATE PACKAGE SET STATUS = '"+status+"' WHERE PACKAGE_ID = "+packageid+";";
+    String sql = "UPDATE PACKAGE SET STATUS = \'"+status+"\' WHERE PACKAGE_ID = "+packageid+";";
     db.executeStatement(sql, "failure");
   }
 
   private void updateTruckStatus(int truckid,String status,int x, int y){
-    String sql = "UPDATE TRUCK SET STATUS = '"+status+"', X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
+    String sql = "UPDATE TRUCK SET STATUS = \'"+status+"\', X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
     db.executeStatement(sql, "failure");
   }
        
@@ -152,7 +154,7 @@ public class Executor {
     try{
     ResultSet rs =db.SelectStatement(sql);
     boolean ismatched;
-    if(rs.getInt("1") > 0){
+    if(rs != null){
       ismatched = true;
     }else{
       ismatched = false;

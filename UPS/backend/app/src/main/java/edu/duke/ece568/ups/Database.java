@@ -15,7 +15,7 @@ public class Database {
     public void connectDB(){
         try {
             Class.forName("org.postgresql.Driver");
-            c = DriverManager.getConnection("jdbc:postgresql://isilo.db.elephantsql.com:5432/wbejxhle?sslmode=disable","wbejxhle", "q8IrlFX_Ch3EoHJoIM06Mbro5a3EJQlb");
+            c = DriverManager.getConnection("jdbc:postgresql://isilo.db.elephantsql.com:5432/wbejxhle","wbejxhle", "q8IrlFX_Ch3EoHJoIM06Mbro5a3EJQlb");
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getClass().getName()+": "+e.getMessage());
@@ -62,24 +62,24 @@ public class Database {
         String query2 = "CREATE TABLE PACKAGE(PACKAGE_ID BIGINT PRIMARY KEY NOT NULL, X INT NOT NULL, Y INT NOT NULL, TRUCK_ID INT NOT NULL, USER_NAME VARCHAR(100) NOT NULL, STATUS VARCHAR(25) NOT NULL);";// status can be pickup, loading, delivering, delivered
         executeStatement(query2, "failure");
 
-        /*
-        String query3 = "CREATE TABLE USERS(USER_ID INT PRIMARY KEY NOT NULL, USERNAME VARCHAR(100) NOT NULL, PASSWORD VARCHAR(128) NOT NULL, SALT VARCHAR(50) NOT NULL);"; 
-        executeStatement(query3, "failure");
-        */
-
-        String query4 = "CREATE TABLE PRODUCT(PRODUCT_ID SERIAL PRIMARY KEY NOT NULL, PACKAGE_ID BIGINT NOT NULL, DESCRIPTION VARCHAR(200), COUNT INT NOT NULL, CONSTRAINT PACK FOREIGN KEY(PACKAGE_ID) REFERENCES PACKAGE(PACKAGE_ID));";
+        //String query3 = "CREATE TABLE USERS(USER_ID INT PRIMARY KEY NOT NULL, USERNAME VARCHAR(100) NOT NULL, PASSWORD VARCHAR(128) NOT NULL, SALT VARCHAR(50) NOT NULL);"; 
+        //executeStatement(query3, "failure");
+        
+        String query4 = "CREATE TABLE PRODUCT(PRODUCT_ID SERIAL PRIMARY KEY NOT NULL, PACKAGE_ID BIGINT NOT NULL, DESCRIPTION VARCHAR(200), COUNT INT NOT NULL);";
         executeStatement(query4, "failure");
     }
 
     public void deleteDB(){
         String query1 = "DROP TABLE IF EXISTS TRUCK;";
         executeStatement(query1, "failure");
+        
         String query2 = "DROP TABLE IF EXISTS PACKAGE;";
-        executeStatement(query2, "failure");
-        /*
+        String out = executeStatement(query2, "failure");
+        //System.out.println("PACKAGE OUTPUT : " + out);
+        
         String query3 = "DROP TABLE IF EXISTS USERS;";
         executeStatement(query3, "failure");
-        */
+        
         String query4 = "DROP TABLE IF EXISTS PRODUCT;";
         executeStatement(query4, "failure");
     }  

@@ -36,7 +36,7 @@ public class AUPickup implements Action{
       String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truckid + " AND STATUS = \'PICKUP\';";
       ResultSet rs = db.SelectStatement(q);
       try{
-        while(rs.next()){
+        while(rs != null && rs.next()){
           long id = rs.getLong("PACKAGE_ID");
           pickup.addPackageid(id);
         }
@@ -54,7 +54,7 @@ public class AUPickup implements Action{
       ResultSet rs = db.SelectStatement(q_whid);
       int whid;
       try{
-        if(rs.next()){
+        if(rs != null && rs.next()){
           int id = rs.getInt(1);
           return id;
         }
