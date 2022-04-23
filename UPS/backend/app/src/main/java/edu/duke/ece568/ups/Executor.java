@@ -163,6 +163,7 @@ public class Executor {
     A_actions.put(amazonseqnum,isAssociated);
     amazonseqnum++;
     isAssociated.sendMessage();
+    isAssociated.setAck();
     }catch(Exception e){
       e.printStackTrace();
     }
