@@ -1,5 +1,61 @@
 {% extends  'base.html' %}
 {% block content %}
+<style>
+    .table_header{
+        margin-top: 50px;
+        margin-left: 130px;
+    }
+table {
+    margin-left: 100px;
+  margin-right: auto;
+border-collapse: collapse;
+
+font-family: Futura, Arial, sans-serif;
+
+}
+
+caption {
+
+font-size: larger;
+
+margin: 1em auto;
+
+}
+
+th,td {
+
+padding: .65em;
+text-align: center;
+
+}
+
+th {
+
+background: #555;
+
+border: 1px solid #777;
+
+color: #fff;
+
+}
+
+td {
+
+border: 1px solid#777;
+
+}
+
+    .delivery_map{
+        position: fixed;
+        top: 9%;
+        left: 50%;
+    }
+</style>
+<div class = "delivery_map">
+    {% autoescape off %}
+    {{ plot_div }}
+    {% endautoescape %}
+</div>
 <div class = "table_header"><h3>Package Detail</h3></div>  
     <table border="1">
         <thead>
