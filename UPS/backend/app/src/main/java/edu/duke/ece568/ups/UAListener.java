@@ -23,7 +23,6 @@ public class UAListener implements Runnable{
             try{
                 AUCommand.Builder recv = AUCommand.newBuilder();
                 if (MessageTransmitter.recvMsgFrom(recv, in)) {
-                    System.out.println("Recieved message from amazon");
                     queue.put(recv);
                 }
             }

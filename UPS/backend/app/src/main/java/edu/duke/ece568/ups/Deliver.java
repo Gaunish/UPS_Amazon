@@ -45,8 +45,10 @@ public class Deliver implements Action{
       } 
       catch(Exception e){ return; }
 
+      /*
       String update = "UPDATE PACKAGE SET STATUS = \'DELIVERING\' WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
       db.executeStatement(update, "failure");
+      */
 
       String update2 = "UPDATE TRUCK SET STATUS = \'DELIVERING\' WHERE TRUCK_ID = " + truck_id;
       db.executeStatement(update2, "failure");

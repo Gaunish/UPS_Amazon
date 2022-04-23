@@ -21,7 +21,6 @@ public class UWReceiver implements Runnable {
       try {
         UResponses.Builder resp = UResponses.newBuilder();
         if (MessageTransmitter.recvMsgFrom(resp, in)) {
-          System.out.println("Recieved message from world");
           queue.put(resp);
         }
       } 

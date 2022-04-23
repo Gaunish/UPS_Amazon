@@ -67,7 +67,7 @@ public class WDeparser implements Runnable{
                 catch(Exception e){}
             }
         }
-
+        /*
         if(resp.getErrorCount() > 0){
             for(UErr err : resp.getErrorList()){
                 //deparse pickup
@@ -81,7 +81,7 @@ public class WDeparser implements Runnable{
                 
             }
         }
-
+        */
         if(resp.getAcksCount() > 0){
             for(long acks : resp.getAcksList()){
                 //deparse acks
