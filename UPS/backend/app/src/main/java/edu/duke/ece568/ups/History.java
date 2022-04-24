@@ -22,8 +22,6 @@ public class History {
             }
         }
         catch(Exception e){}
-
-        System.out.println(packageid);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String history = "INSERT INTO HISTORY VALUES(" + packageid + ",\'" + str + "\', " + x + ", " + y + ", \'" + timestamp + "\');";
         db.executeStatement(history, "failure");

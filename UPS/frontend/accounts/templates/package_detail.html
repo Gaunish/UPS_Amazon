@@ -79,8 +79,9 @@ border: 1px solid#777;
     </table>
     <br>
     <br>
+    <h2>Tracking History</h2>
     {%for line in history%}
-    <h2><u>{{line.status}}</u></h2><h4>{{line.time}}</h4>
+    <h3><u>{{line.status}}</u></h3><h4>{{line.time}}</h4>
     <h4>Truck Location: ({{line.x}}, {{line.y}})</h4>
     <br>
     {% endfor %}

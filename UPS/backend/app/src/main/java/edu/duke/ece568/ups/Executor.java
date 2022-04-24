@@ -63,7 +63,7 @@ public class Executor {
         x_cood = truckstatus.getInt("X");
         y_cood = truckstatus.getInt("Y");
       } else {
-        sql = "SELECT * FROM TRUCK WHERE STATUS = \'IDLE\';";
+        sql = "SELECT * FROM TRUCK WHERE STATUS = 'IDLE';";
         ResultSet newtruck = db.SelectStatement(sql);
         if (newtruck != null && newtruck.next()) {
           truckid = newtruck.getInt("truck_id");
@@ -92,7 +92,7 @@ public class Executor {
     }
   }
 
-  public void updateHist(int truckid, long packageid, String str){
+  public synchronized void updateHist(int truckid, long packageid, String str){
     history.updateHistory(db, packageid, truckid, str);
     try{
     history.sendQuery(W_actions, WConn.getOutputStream(), truckid, worldseqnum);
@@ -108,9 +108,8 @@ public class Executor {
     }
   }
 
-  public void updatePackageHist(int truck_id, String status, String query){
+  public synchronized void updatePackageHist(int truck_id, String status, String query){
     String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'"+ status +"\';";
-
     try{
       ResultSet res = db.SelectStatement(q);
       while(res != null && res.next()){
@@ -163,8 +162,8 @@ public class Executor {
     String q = "SELECT * FROM PACKAGE WHERE PACKAGE_ID = " + packageid + ";";
     ResultSet rs = db.SelectStatement(q);
     if(rs.next()){
-      truck_id = rs.getInt("TRUCK_ID");
-    }
+    truck_id = rs.getInt("TRUCK_ID");
+        }
     updateHist(truck_id, packageid, "Package is delivered");
 
     }catch(Exception e){
@@ -177,7 +176,7 @@ public class Executor {
     String status = truckstatus.getStatus();
     int x = truckstatus.getX();
     int y = truckstatus.getY();
-    updateTruckStatus(truckid, status,x,y);
+    updateTruckStatus(truckid,x,y);
   }
 
   private void updatePackageStatus(long packageid,String status){
@@ -185,8 +184,8 @@ public class Executor {
     db.executeStatement(sql, "failure");
   }
 
-  private void updateTruckStatus(int truckid,String status,int x, int y){
-    String sql = "UPDATE TRUCK SET STATUS = \'"+status+"\', X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
+  private void updateTruckStatus(int truckid,int x, int y){
+    String sql = "UPDATE TRUCK SET X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
     db.executeStatement(sql, "failure");
   }
        
@@ -220,18 +219,16 @@ public class Executor {
     if(status.equals("ARRIVE WAREHOUSE")){
       new_status = "loading";
       String update_package = "UPDATE PACKAGE SET STATUS = \'LOADING\' WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
-      db.executeStatement(update_package, "failure");
-
+      db.executeStatement(update_package, "failure");      
       //send notification to amazon
       Action pickupReady = new AUPickup(Aconn.getOutputStream(), db, truck_id, amazonseqnum); 
       A_actions.put(amazonseqnum,pickupReady);
       amazonseqnum++;
       pickupReady.sendMessage();
-
       updatePackageHist(truck_id, "LOADING", "Package is loading");
     }
     else{
-      new_status = "idle";
+      new_status = "IDLE";
     }
 
     //Update truck status
