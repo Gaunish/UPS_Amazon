@@ -1,0 +1,88 @@
+{% extends  'base.html' %}
+{% block content %}
+<style>
+    .table_header{
+        margin-top: 50px;
+        margin-left: 130px;
+    }
+table {
+    margin-left: 100px;
+  margin-right: auto;
+border-collapse: collapse;
+
+font-family: Futura, Arial, sans-serif;
+
+}
+
+caption {
+
+font-size: larger;
+
+margin: 1em auto;
+
+}
+
+th,td {
+
+padding: .65em;
+text-align: center;
+
+}
+
+th {
+
+background: #555;
+
+border: 1px solid #777;
+
+color: #fff;
+
+}
+
+td {
+
+border: 1px solid#777;
+
+}
+
+    .delivery_map{
+        position: fixed;
+        top: 9%;
+        left: 50%;
+    }
+</style>
+<div class = "delivery_map">
+    {% autoescape off %}
+    {{ plot_div }}
+    {% endautoescape %}
+    <h4>Estimated delivery distance: {{estimate}} meters </h4>
+</div>
+<div class = "table_header"><h3>Product Detail</h3></div>  
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Description</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for item in products %}
+            <tr>
+                <td>{{ item.package_id}}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.count}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <br>
+    <h2>Tracking History</h2>
+    {%for line in history%}
+    <h3><u>{{line.status}}</u></h3><h4>{{line.time}}</h4>
+    <h4>Truck Location: ({{line.x}}, {{line.y}})</h4>
+    <br>
+    {% endfor %}
+{% endblock %}

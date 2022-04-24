@@ -32,11 +32,10 @@ public class Command{
                     timer.cancel();
                   }
                   else{
-                  System.out.println("Sqenum "+seqNo+": Sending Message to world");
                     MessageTransmitter.sendMsgTo(message, out);
                   }
                 }
-              }, 0, 5000);//1s timeout
+              }, 0, 50000);//1s timeout
       }
     
 }

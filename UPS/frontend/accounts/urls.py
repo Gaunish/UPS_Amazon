@@ -4,14 +4,16 @@ from . import views as custom_views
 
 urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', views.LogoutView.as_view(), name='logout'),
+    path('logout/', views.LogoutView.as_view(template_name='registration/logged_out.html'), name='logout'),
     path("register/", custom_views.register_request, name="register"),
-    path('password-reset/', views.PasswordResetView.as_view(),
-         name='password_reset'),
-    path('password-change/done/', views.PasswordChangeDoneView.as_view(),
-         name='password_change_done'),
-    path('password-change/', views.PasswordChangeView.as_view(),
-         name='password_change'),
-    path('password-reset/done/', views.PasswordResetDoneView.as_view(),
-         name='password_reset_done'),
+    path('password_reset/done/', views.PasswordResetDoneView.as_view(
+        template_name='password/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(
+        template_name="password/password_reset_confirm.html"), name='password_reset_confirm'),
+    path('reset/done/', views.PasswordResetCompleteView.as_view(
+        template_name='password/password_reset_complete.html'), name='password_reset_complete'),
+    path("password_reset", custom_views.password_reset_request,
+         name="password_reset"),
+    path('package/<int:id>', custom_views.package, name="package"),
+    path('profile', custom_views.profile, name="profile"),
 ]

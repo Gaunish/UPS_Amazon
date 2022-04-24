@@ -32,10 +32,10 @@ public class Deliver implements Action{
       goDeliver.setTruckid(truckid);
       goDeliver.setSeqnum(seqnum);
 
-      String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+      String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'LOADING\';";
       ResultSet res = db.SelectStatement(q);
       try{
-        while(res.next()){
+        while(res != null && res.next()){
           UDeliveryLocation.Builder del = UDeliveryLocation.newBuilder();
           del.setPackageid(res.getLong("PACKAGE_ID"));
           del.setX(res.getInt("X"));
@@ -45,8 +45,10 @@ public class Deliver implements Action{
       } 
       catch(Exception e){ return; }
 
-      String update = "UPDATE PACKAGE SET STATUS = \'DELIVERING\' WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+      
+      String update = "UPDATE PACKAGE SET STATUS = \'DELIVERING\' WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'LOADING\';";
       db.executeStatement(update, "failure");
+      
 
       String update2 = "UPDATE TRUCK SET STATUS = \'DELIVERING\' WHERE TRUCK_ID = " + truck_id;
       db.executeStatement(update2, "failure");

@@ -15,7 +15,8 @@ public class UWReceiver implements Runnable {
   }
 
   @Override
-  public synchronized void run() {
+  public void run() {
+    System.out.println("Started World listener");
     while (true) {
       try {
         UResponses.Builder resp = UResponses.newBuilder();

@@ -18,7 +18,7 @@ public class MessageTransmitter {
    * @param <T> generic type of the data
    * @return send result
    */
-  public static synchronized <T extends GeneratedMessageV3> boolean sendMsgTo(T msg, OutputStream out) {
+  public static <T extends GeneratedMessageV3> boolean sendMsgTo(T msg, OutputStream out) {
     try {
       byte[] data = msg.toByteArray();
       CodedOutputStream codedOutputStream = CodedOutputStream.newInstance(out);
@@ -26,6 +26,7 @@ public class MessageTransmitter {
       codedOutputStream.writeRawBytes(data);
       // NOTE!!! always flush the result to stream
       codedOutputStream.flush();
+      System.out.println(msg);
       return true;
     } catch (IOException e) {
       System.err.println("sendToWorld: " + e.toString());
@@ -42,13 +43,14 @@ public class MessageTransmitter {
    * @param <T>      generic type of the response
    * @return true receive successful
    */
-  public static synchronized <T extends GeneratedMessageV3.Builder<?>> boolean recvMsgFrom(T response, InputStream in) {
+  public static <T extends GeneratedMessageV3.Builder<?>> boolean recvMsgFrom(T response, InputStream in) {
     try {
       CodedInputStream codedInputStream = CodedInputStream.newInstance(in);
       int len = codedInputStream.readRawVarint32();
       int oldLimit = codedInputStream.pushLimit(len);
       response.mergeFrom(codedInputStream);
       codedInputStream.popLimit(oldLimit);
+      System.out.println(response.build());
       return true;
     } catch (IOException e) {
       System.err.println("recv: " + e.toString());

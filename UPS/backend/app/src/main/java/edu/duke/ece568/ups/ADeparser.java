@@ -1,6 +1,9 @@
 package edu.duke.ece568.ups;
 
 import java.util.concurrent.BlockingQueue;
+
+import javax.swing.plaf.synth.SynthPasswordFieldUI;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.io.IOException;
@@ -61,7 +64,7 @@ public class ADeparser implements Runnable{
                 catch(Exception e){}
             }
         }
-
+        /*
         if(resp.getErrorCount() > 0){
             for(Err err : resp.getErrorList()){
                 //deparse error
@@ -75,7 +78,7 @@ public class ADeparser implements Runnable{
     
             }
         }
-
+        */
         if(resp.getAcksCount() > 0){
             for(long ack : resp.getAcksList()){
                 //deparse acks

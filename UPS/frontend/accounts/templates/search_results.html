@@ -1,0 +1,72 @@
+{% extends  'base.html' %}
+{% block content %}
+<style>
+    .table_header{
+        text-align: center;
+    }
+table {
+    margin-left: auto;
+  margin-right: auto;
+border-collapse: collapse;
+
+font-family: Futura, Arial, sans-serif;
+
+}
+
+caption {
+
+font-size: larger;
+
+margin: 1em auto;
+
+}
+
+th,td {
+
+padding: .65em;
+text-align: center;
+
+}
+
+th {
+
+background: #555;
+
+border: 1px solid #777;
+
+color: #fff;
+
+}
+
+td {
+
+border: 1px solid#777;
+
+}
+</style>
+
+<div class = "table_header"><h3>Your Search Result</h3></div>  
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Package ID</th>
+                <th>Destination-X</th>
+                <th>Destination-Y</th>
+                <th>Truck ID</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>{{ package.package_id}}</td>
+                <td>{{ package.x }}</td>
+                <td>{{ package.y }}</td>
+                <td>{{ package.truck_id }}</td>
+                <td>{{package.status}}</td>
+                <td><a href ="{% url 'package_detail' %}?id={{package.package_id}}">View Detail</a></td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

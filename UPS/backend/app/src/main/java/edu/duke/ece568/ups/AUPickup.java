@@ -33,15 +33,17 @@ public class AUPickup implements Action{
       pickup.setTruckid(truckid);
       pickup.setSeqnum(seqnum);
 
-      String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truckid + " AND STATUS = \'PICKUP\';";
+      String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truckid + " AND STATUS = \'LOADING\';";
       ResultSet rs = db.SelectStatement(q);
       try{
-        while(rs.next()){
+        while(rs != null && rs.next()){
           long id = rs.getLong("PACKAGE_ID");
           pickup.addPackageid(id);
         }
       }
-      catch(Exception e){ return; }
+      catch(Exception e){
+        e.printStackTrace();
+        return; }
 
       this.pickup = pickup;
       UACommand.Builder ua = UACommand.newBuilder();
@@ -54,7 +56,7 @@ public class AUPickup implements Action{
       ResultSet rs = db.SelectStatement(q_whid);
       int whid;
       try{
-        if(rs.next()){
+        if(rs != null && rs.next()){
           int id = rs.getInt(1);
           return id;
         }
