@@ -13,14 +13,17 @@ public class History {
     public void updateHistory(Database db, long packageid, int truckid, String str){
         
         String truck_q = "SELECT * FROM TRUCK WHERE TRUCK_ID = " + truckid + ";";
-        ResultSet truckstatus = db.SelectStatement(truck_q);
         int x = -1, y = -1;
         try{
-            x = truckstatus.getInt("X");
-            y = truckstatus.getInt("Y");
+            ResultSet truckstatus = db.SelectStatement(truck_q);
+            if(truckstatus.next()){
+                x = truckstatus.getInt("X");
+                y = truckstatus.getInt("Y");
+            }
         }
         catch(Exception e){}
 
+        System.out.println(packageid);
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         String history = "INSERT INTO HISTORY VALUES(" + packageid + ",\'" + str + "\', " + x + ", " + y + ", \'" + timestamp + "\');";
         db.executeStatement(history, "failure");

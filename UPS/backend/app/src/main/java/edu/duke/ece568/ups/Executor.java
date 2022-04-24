@@ -54,7 +54,7 @@ public class Executor {
 
   private void UpdatePackageTable(int whid, long packageid, int x, int y, String username) {
     // query truck status
-    String sql = "SELECT * FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
+    String sql = "SELECT * FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'TRAVELING\' OR STATUS = \'ARRIVE WAREHOUSE\';";
     ResultSet truckstatus = db.SelectStatement(sql);
     int truckid, x_cood, y_cood;
     try {
@@ -63,13 +63,13 @@ public class Executor {
         x_cood = truckstatus.getInt("X");
         y_cood = truckstatus.getInt("Y");
       } else {
-        sql = "SELECT * FROM TRUCK WHERE STATUS = \'idle\';";
+        sql = "SELECT * FROM TRUCK WHERE STATUS = \'IDLE\';";
         ResultSet newtruck = db.SelectStatement(sql);
         if (newtruck != null && newtruck.next()) {
           truckid = newtruck.getInt("truck_id");
           x_cood = newtruck.getInt("X");
           y_cood = newtruck.getInt("Y");
-          sql = "UPDATE TRUCK SET STATUS = 'traveling', WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
+          sql = "UPDATE TRUCK SET STATUS = 'TRAVELING', WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
           db.executeStatement(sql, "failure");
           Action pickup = new Pickup(WConn.getOutputStream(), truckid, whid, worldseqnum);
           W_actions.put(worldseqnum, pickup);
@@ -110,8 +110,9 @@ public class Executor {
 
   public void updatePackageHist(int truck_id, String status, String query){
     String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'"+ status +"\';";
-    ResultSet res = db.SelectStatement(q);
+
     try{
+      ResultSet res = db.SelectStatement(q);
       while(res != null && res.next()){
         long packageid = res.getLong("PACKAGE_ID");
         updateHist(truck_id, packageid, query);
@@ -161,8 +162,9 @@ public class Executor {
     int truck_id = -1;
     String q = "SELECT * FROM PACKAGE WHERE PACKAGE_ID = " + packageid + ";";
     ResultSet rs = db.SelectStatement(q);
-    
-    truck_id = rs.getInt("TRUCK_ID");
+    if(rs.next()){
+      truck_id = rs.getInt("TRUCK_ID");
+    }
     updateHist(truck_id, packageid, "Package is delivered");
 
     }catch(Exception e){
@@ -220,13 +222,13 @@ public class Executor {
       String update_package = "UPDATE PACKAGE SET STATUS = \'LOADING\' WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
       db.executeStatement(update_package, "failure");
 
-      updatePackageHist(truck_id, "LOADING", "Package is loading");
-      
       //send notification to amazon
       Action pickupReady = new AUPickup(Aconn.getOutputStream(), db, truck_id, amazonseqnum); 
       A_actions.put(amazonseqnum,pickupReady);
       amazonseqnum++;
       pickupReady.sendMessage();
+
+      updatePackageHist(truck_id, "LOADING", "Package is loading");
     }
     else{
       new_status = "idle";
