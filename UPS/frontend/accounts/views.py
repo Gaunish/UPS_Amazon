@@ -78,8 +78,9 @@ def package(request, id):
     if request.method == "GET":
         pack = Package.objects.get(package_id=id)
         products = Product.objects.filter(package=pack)
+        history = History.objects.filter(package_id=id)
         form = ChangeLocationForm()
-        return render(request, "home/package.html", {"package": pack, "products": list(products), "form": form})
+        return render(request, "home/package.html", {"package": pack, "products": list(products), "form": form, "history": history})
 
     form = ChangeLocationForm(request.POST)
     if form.is_valid():

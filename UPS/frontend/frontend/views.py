@@ -44,4 +44,6 @@ def package_detail(request):
     products = Product.objects.filter(package_id=packageid)
     estimate = (truck_result.x-package_result.x)**2 + \
         (truck_result.y-package_result.y)**2
-    return render(request, "package_detail.html", {'products': list(products), 'plot_div': plot_div, 'estimate': estimate})
+    
+    history = History.objects.filter(package_id=id)
+    return render(request, "package_detail.html", {'products': list(products), 'plot_div': plot_div, 'estimate': estimate, "history": history})
