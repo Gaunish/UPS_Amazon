@@ -52,6 +52,7 @@ border: 1px solid#777;
     }
 </style>
     {%if package.status == 'PICKUP' or package.status == 'LOADING'%}
+    <h4>Change Delivery Location</h4>
         <form action="" method="post">
           {% csrf_token %}
           <table>{{form.as_table}}</table>
@@ -88,11 +89,11 @@ border: 1px solid#777;
 </div>
     <br>
     <br>
-      
+    <h2>Tracking History</h2>
     {%for line in history%}
-    <h2><u>{{line.status}}</u></h2><h4>{{line.time}}</h4>
+    <h3><u>{{line.status}}</u></h3>
+    <h4>{{line.time}}</h4>
     <h4>Truck Location: ({{line.x}}, {{line.y}})</h4>
     <br>
     {% endfor %}
-
 {% endblock %}

@@ -7,6 +7,7 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
+
 class History(models.Model):
     package_id = models.BigIntegerField(primary_key=True)
     status = models.CharField(max_length=50)
