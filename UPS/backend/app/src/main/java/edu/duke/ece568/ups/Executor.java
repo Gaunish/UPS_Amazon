@@ -52,15 +52,19 @@ public class Executor {
     // query truck status
     String sql = "SELECT * FROM TRUCK WHERE WHID = " + whid + " AND STATUS = \'traveling\' OR STATUS = \'ARRIVE WAREHOUSE\';";
     ResultSet truckstatus = db.SelectStatement(sql);
-    int truckid;
+    int truckid, x_cood, y_cood;
     try {
       if (truckstatus != null && truckstatus.next()) {
         truckid = truckstatus.getInt("truck_id");
+        x_cood = truckstatus.getInt("X");
+        y_cood = truckstatus.getInt("Y");
       } else {
         sql = "SELECT * FROM TRUCK WHERE STATUS = \'idle\';";
         ResultSet newtruck = db.SelectStatement(sql);
         if (newtruck != null && newtruck.next()) {
           truckid = newtruck.getInt("truck_id");
+          x_cood = newtruck.getInt("X");
+          y_cood = newtruck.getInt("Y");
           sql = "UPDATE TRUCK SET STATUS = 'traveling', WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
           db.executeStatement(sql, "failure");
           Action pickup = new Pickup(WConn.getOutputStream(), truckid, whid, worldseqnum);
@@ -76,6 +80,10 @@ public class Executor {
       String update = "INSERT INTO PACKAGE VALUES(" + packageid + "," + x + "," + y + "," + truckid + ",\'" + username
           + "\',\'PICKUP\');";
       db.executeStatement(update, "failure");
+
+      String history = "INSERT INTO HISTORY VALUES(" + packageid + ",\'" + "Package is ready to pickup" + "\', " + x_cood + ", " + y_cood + ";";
+      db.executeStatement(history, "failure");
+      
     } catch (Exception e) {
       e.printStackTrace();
     }

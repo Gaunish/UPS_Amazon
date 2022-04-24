@@ -67,6 +67,9 @@ public class Database {
         
         String query4 = "CREATE TABLE PRODUCT(PRODUCT_ID SERIAL PRIMARY KEY NOT NULL, PACKAGE_ID BIGINT NOT NULL, DESCRIPTION VARCHAR(200), COUNT INT NOT NULL);";
         executeStatement(query4, "failure");
+
+        String query5 = "CREATE TABLE HISTORY(PACKAGE_ID BIGINT PRIMARY KEY NOT NULL, STATUS VARCHAR(50) NOT NULL, X INT NOT NULL, Y INT NOT NULL);";
+        executeStatement(query5, "failure");
     }
 
     public void deleteDB(){
@@ -82,5 +85,8 @@ public class Database {
         
         String query4 = "DROP TABLE IF EXISTS PRODUCT;";
         executeStatement(query4, "failure");
+
+        String query5 = "DROP TABLE IF EXISTS HISTORY;";
+        executeStatement(query5, "failure");
     }  
 }
