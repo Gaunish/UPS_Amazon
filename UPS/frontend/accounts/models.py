@@ -12,6 +12,7 @@ class History(models.Model):
     status = models.CharField(max_length=50)
     x = models.IntegerField()
     y = models.IntegerField()
+    time = models.DateTimeField()
 
     class Meta:
         managed = False

@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.generic.base import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from accounts.models import Package, Product, Truck
+from accounts.models import Package, Product, Truck, History
 from django.http import HttpResponse, JsonResponse
 from plotly.offline import plot
 import plotly.graph_objects as go
@@ -45,5 +45,5 @@ def package_detail(request):
     estimate = (truck_result.x-package_result.x)**2 + \
         (truck_result.y-package_result.y)**2
     
-    history = History.objects.filter(package_id=id)
+    history = History.objects.filter(package_id=packageid)
     return render(request, "package_detail.html", {'products': list(products), 'plot_div': plot_div, 'estimate': estimate, "history": history})
