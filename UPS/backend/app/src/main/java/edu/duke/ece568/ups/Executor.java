@@ -95,7 +95,7 @@ public class Executor {
   public void updateHist(int truckid, long packageid, String str){
     history.updateHistory(db, packageid, truckid, str);
     try{
-    history.sendQuery(WConn.getOutputStream(), truckid, worldseqnum);
+    history.sendQuery(W_actions, WConn.getOutputStream(), truckid, worldseqnum);
     }catch(Exception e){}
     worldseqnum++;
   }
