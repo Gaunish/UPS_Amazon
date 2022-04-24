@@ -2,8 +2,10 @@ package edu.duke.ece568.ups;
 
 import java.io.IOException;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.OutputStream;
 
 import edu.duke.ece568.ups.AmazonUps.AUPack;
 import edu.duke.ece568.ups.AmazonUps.AUReadyForDelivery;
@@ -17,6 +19,7 @@ import edu.duke.ece568.ups.WorldUps.*;
 public class Executor {
     Database db;
     ClientConnection WConn, Aconn;
+    History history;
   //volatile: any change made to this variable will be visible immediately in all threads
   public volatile long worldseqnum,amazonseqnum;
     ConcurrentHashMap<Long,Action> W_actions, A_actions;
@@ -30,6 +33,7 @@ public class Executor {
         this.A_actions = A_actions;
         this.worldseqnum = wseq;
         this.amazonseqnum = aseq;
+        this.history = new History();
     }
 
   public void execute(AURequestPickup pickup) {
@@ -81,12 +85,19 @@ public class Executor {
           + "\',\'PICKUP\');";
       db.executeStatement(update, "failure");
 
-      String history = "INSERT INTO HISTORY VALUES(" + packageid + ",\'" + "Package is ready to pickup" + "\', " + x_cood + ", " + y_cood + ");";
-      db.executeStatement(history, "failure");
+      updateHist(truckid, packageid,  "Package is ready to pickup");
       
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  public void updateHist(int truckid, long packageid, String str){
+    history.updateHistory(db, packageid, truckid, str);
+    try{
+    history.sendQuery(WConn.getOutputStream(), truckid, worldseqnum);
+    }catch(Exception e){}
+    worldseqnum++;
   }
 
   private void insertProducts(long packageid,APack apack){
@@ -97,14 +108,27 @@ public class Executor {
     }
   }
 
-    public void execute(AUReadyForDelivery delivery) throws IOException {
+  public void updatePackageHist(int truck_id, String status, String query){
+    String q = "SELECT * FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'"+ status +"\';";
+    ResultSet res = db.SelectStatement(q);
+    try{
+      while(res != null && res.next()){
+        long packageid = res.getLong("PACKAGE_ID");
+        updateHist(truck_id, packageid, query);
+      }
+    }
+    catch(Exception e){}
+  }
+
+  public void execute(AUReadyForDelivery delivery) throws IOException {
         int truck_id = delivery.getTruckid();
         Action d = new Deliver(db, WConn.getOutputStream(), truck_id, worldseqnum);
         W_actions.put(worldseqnum, d);
         worldseqnum++;
         d.sendMessage();
-        //String update_q = "UPDATE TRUCK SET STATUS = ";
-    }
+        
+        updatePackageHist(truck_id, "DELIVERING", "Package is out for delivery");
+  }
 
     //amazon error
     public void execute(Err errA) throws IOException {
@@ -113,8 +137,8 @@ public class Executor {
         Action a = A_actions.get(origin_seqno);
         int truck_id = a.getTruckid();
         if(a.getType() == "AUPickup"){
-          String q1 = "DELETE FROM PRODUCT WHERE PACKAGE_ID IN (SELECT PACKAGE_ID FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\');";
-          String q2 = "DELETE FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+          String q1 = "DELETE FROM PRODUCT WHERE PACKAGE_ID IN (SELECT PACKAGE_ID FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\' OR STATUS = \'LOADING\');";
+          String q2 = "DELETE FROM PACKAGE WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\' OR STATUS = \'LOADING\';";
 
           db.executeStatement(q1, "failure");
           db.executeStatement(q2, "failure");
@@ -133,6 +157,14 @@ public class Executor {
     A_actions.put(amazonseqnum,deliveryMade);
     amazonseqnum++;
     deliveryMade.sendMessage();
+
+    int truck_id = -1;
+    String q = "SELECT * FROM PACKAGE WHERE PACKAGE_ID = " + packageid + ";";
+    ResultSet rs = db.SelectStatement(q);
+    
+    truck_id = rs.getInt("TRUCK_ID");
+    updateHist(truck_id, packageid, "Package is delivered");
+
     }catch(Exception e){
       e.printStackTrace();
     }
@@ -185,7 +217,11 @@ public class Executor {
     //Pickup request
     if(status.equals("ARRIVE WAREHOUSE")){
       new_status = "loading";
+      String update_package = "UPDATE PACKAGE SET STATUS = \'LOADING\' WHERE TRUCK_ID = " + truck_id + " AND STATUS = \'PICKUP\';";
+      db.executeStatement(update_package, "failure");
 
+      updatePackageHist(truck_id, "LOADING", "Package is loading");
+      
       //send notification to amazon
       Action pickupReady = new AUPickup(Aconn.getOutputStream(), db, truck_id, amazonseqnum); 
       A_actions.put(amazonseqnum,pickupReady);

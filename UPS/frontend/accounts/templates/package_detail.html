@@ -57,11 +57,11 @@ border: 1px solid#777;
     {% endautoescape %}
     <h4>Estimated delivery distance: {{estimate}} meters </h4>
 </div>
-<div class = "table_header"><h3>Package Detail</h3></div>  
+<div class = "table_header"><h3>Product Detail</h3></div>  
     <table border="1">
         <thead>
             <tr>
-                <th>Package ID</th>
+                <th>Product ID</th>
                 <th>Description</th>
                 <th>Count</th>
             </tr>
@@ -77,4 +77,11 @@ border: 1px solid#777;
             {% endfor %}
         </tbody>
     </table>
+    <br>
+    <br>
+    {%for line in history%}
+    <h2><u>{{line.status}}</u></h2><h4>{{line.time}}</h4>
+    <h4>Truck Location: ({{line.x}}, {{line.y}})</h4>
+    <br>
+    {% endfor %}
 {% endblock %}
