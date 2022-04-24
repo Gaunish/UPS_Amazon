@@ -8,7 +8,7 @@
 from django.db import models
 
 class History(models.Model):
-    package_id = models.BigIntegerField(primary_key=True)
+    package_id = models.BigIntegerField()
     status = models.CharField(max_length=50)
     x = models.IntegerField()
     y = models.IntegerField()
