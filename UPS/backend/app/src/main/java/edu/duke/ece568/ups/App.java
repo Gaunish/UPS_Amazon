@@ -69,7 +69,7 @@ public class App {
       truck.setId(i);
       truck.setX(1);
       truck.setY(1);
-      sql = "INSERT INTO TRUCK VALUES("+i+", -1, \'idle\', 1, 1);";
+      sql = "INSERT INTO TRUCK VALUES("+i+", -1, \'IDLE\', 1, 1);";
       db.executeStatement(sql, "Error");
       connect.addTrucks(truck);
     }

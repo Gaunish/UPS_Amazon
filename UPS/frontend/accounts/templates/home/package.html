@@ -89,11 +89,11 @@ border: 1px solid#777;
 </div>
     <br>
     <br>
-      
-<div class = "table_header"><h3> Tracking History</h3></div>
-{%for line in history%}
-<li>{{ line.time}}   package has been {{line.status}} at location ({{line.x}}, {{line.y}})</li>
-{% endfor %}
-</div>
-
+    <h2>Tracking History</h2>
+    {%for line in history%}
+    <h3><u>{{line.status}}</u></h3>
+    <h4>{{line.time}}</h4>
+    <h4>Truck Location: ({{line.x}}, {{line.y}})</h4>
+    <br>
+    {% endfor %}
 {% endblock %}

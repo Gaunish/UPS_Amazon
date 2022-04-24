@@ -63,7 +63,7 @@ public class Executor {
         x_cood = truckstatus.getInt("X");
         y_cood = truckstatus.getInt("Y");
       } else {
-        sql = "SELECT * FROM TRUCK WHERE STATUS = \'IDLE\';";
+        sql = "SELECT * FROM TRUCK WHERE STATUS = 'IDLE';";
         ResultSet newtruck = db.SelectStatement(sql);
         if (newtruck != null && newtruck.next()) {
           truckid = newtruck.getInt("truck_id");
@@ -114,7 +114,6 @@ public class Executor {
       ResultSet res = db.SelectStatement(q);
       while(res != null && res.next()){
         long packageid = res.getLong("PACKAGE_ID");
-        System.out.println("########Package_id = "+packageid);
         updateHist(truck_id, packageid, query);
       }
     }
@@ -177,7 +176,7 @@ public class Executor {
     String status = truckstatus.getStatus();
     int x = truckstatus.getX();
     int y = truckstatus.getY();
-    updateTruckStatus(truckid, status,x,y);
+    updateTruckStatus(truckid,x,y);
   }
 
   private void updatePackageStatus(long packageid,String status){
@@ -185,8 +184,8 @@ public class Executor {
     db.executeStatement(sql, "failure");
   }
 
-  private void updateTruckStatus(int truckid,String status,int x, int y){
-    String sql = "UPDATE TRUCK SET STATUS = \'"+status+"\', X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
+  private void updateTruckStatus(int truckid,int x, int y){
+    String sql = "UPDATE TRUCK SET X ="+x+",Y ="+y+" WHERE TRUCK_ID = "+truckid+";";
     db.executeStatement(sql, "failure");
   }
        
@@ -229,7 +228,7 @@ public class Executor {
       updatePackageHist(truck_id, "LOADING", "Package is loading");
     }
     else{
-      new_status = "idle";
+      new_status = "IDLE";
     }
 
     //Update truck status

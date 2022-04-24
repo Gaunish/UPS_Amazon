@@ -1,0 +1,2 @@
+To start the backend, simply do "sudo docker-compose build" and then "sudo docker-compose up"
+To start the frontend, first install the dependency "sudo apt install python3-pip python3-django django-crispy-forms" then go into the "frontend" subdirectory and do python3 manage.py runserver, and open the webaddress displayed in the terminal (underlined)

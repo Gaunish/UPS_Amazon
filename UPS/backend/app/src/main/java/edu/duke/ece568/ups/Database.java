@@ -59,7 +59,7 @@ public class Database {
 
         //-1 Truck id means package has been delivered
         //-1 user id means no owner
-        String query2 = "CREATE TABLE PACKAGE(PACKAGE_ID BIGINT PRIMARY KEY NOT NULL, X INT NOT NULL, Y INT NOT NULL, TRUCK_ID INT NOT NULL, USER_NAME VARCHAR(100) NOT NULL, STATUS VARCHAR(25) NOT NULL);";// status can be pickup, loading, delivering, delivered
+        String query2 = "CREATE TABLE PACKAGE(PACKAGE_ID BIGINT PRIMARY KEY NOT NULL, X INT NOT NULL, Y INT NOT NULL, TRUCK_ID INT NOT NULL, USER_NAME VARCHAR(100), STATUS VARCHAR(25) NOT NULL);";// status can be pickup, loading, delivering, delivered
         executeStatement(query2, "failure");
 
         //String query3 = "CREATE TABLE USERS(USER_ID INT PRIMARY KEY NOT NULL, USERNAME VARCHAR(100) NOT NULL, PASSWORD VARCHAR(128) NOT NULL, SALT VARCHAR(50) NOT NULL);"; 
@@ -68,7 +68,7 @@ public class Database {
         String query4 = "CREATE TABLE PRODUCT(PRODUCT_ID SERIAL PRIMARY KEY NOT NULL, PACKAGE_ID BIGINT NOT NULL, DESCRIPTION VARCHAR(200), COUNT INT NOT NULL);";
         executeStatement(query4, "failure");
 
-        String query5 = "CREATE TABLE HISTORY(PACKAGE_ID BIGINT PRIMARY KEY NOT NULL, STATUS VARCHAR(50) NOT NULL, X INT NOT NULL, Y INT NOT NULL, TIME TIMESTAMP NOT NULL);";
+        String query5 = "CREATE TABLE HISTORY(PACKAGE_ID BIGINT NOT NULL, STATUS VARCHAR(50) NOT NULL, X INT NOT NULL, Y INT NOT NULL, TIME TIMESTAMP NOT NULL);";
         executeStatement(query5, "failure");
     }
 
