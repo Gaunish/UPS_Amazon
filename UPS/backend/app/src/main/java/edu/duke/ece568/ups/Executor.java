@@ -61,8 +61,7 @@ public class Executor {
         ResultSet newtruck = db.SelectStatement(sql);
         if (newtruck != null && newtruck.next()) {
           truckid = newtruck.getInt("truck_id");
-          System.out.println("TRUCK_ID : "+ truckid);
-          sql = "UPDATE TRUCK SET STATUS = \'traveling\', WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
+          sql = "UPDATE TRUCK SET STATUS = 'traveling', WHID =" + whid + " WHERE TRUCK_ID =" + truckid + ";";
           db.executeStatement(sql, "failure");
           Action pickup = new Pickup(WConn.getOutputStream(), truckid, whid, worldseqnum);
           W_actions.put(worldseqnum, pickup);
@@ -74,8 +73,8 @@ public class Executor {
           return;
         }
       }
-      String update = "INSERT INTO PACKAGE VALUES(" + packageid + "," + x + "," + y + "," + truckid + "," + username
-          + ",\'pickup\');";
+      String update = "INSERT INTO PACKAGE VALUES(" + packageid + "," + x + "," + y + "," + truckid + ",\'" + username
+          + "\',\'PICKUP\');";
       db.executeStatement(update, "failure");
     } catch (Exception e) {
       e.printStackTrace();
@@ -164,6 +163,7 @@ public class Executor {
     A_actions.put(amazonseqnum,isAssociated);
     amazonseqnum++;
     isAssociated.sendMessage();
+    isAssociated.setAck();
     }catch(Exception e){
       e.printStackTrace();
     }
@@ -172,11 +172,10 @@ public class Executor {
   public void execute(UFinished completions) throws IOException {
     int truck_id = completions.getTruckid();
     String status = completions.getStatus();
-     
     String new_status = "";
 
     //Pickup request
-    if(status.equals("arrive warehouse")){
+    if(status.equals("ARRIVE WAREHOUSE")){
       new_status = "loading";
 
       //send notification to amazon

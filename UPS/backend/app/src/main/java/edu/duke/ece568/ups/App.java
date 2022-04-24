@@ -49,9 +49,9 @@ public class App {
 
   private static void connect() throws IOException{
     db.connectDB();
-    worldConnection = new ClientConnection("vcm-25935.vm.duke.edu", 12345);
+    worldConnection = new ClientConnection("vcm-24690.vm.duke.edu", 12345);
     System.out.println("Connected to world server");
-    amazonConnection = new ClientConnection("172.18.0.1", 6666);
+    amazonConnection = new ClientConnection("vcm-24690.vm.duke.edu", 6666);
     System.out.println("Connected to amazon server");
     executor = new Executor(db, worldConnection, amazonConnection, worldActions, amazonActions, worldSeqno, amznSeqno);
     
@@ -123,5 +123,7 @@ public class App {
     connect();
     connectAmazon();
     run();
+    while(true){
+    }
   }
 }

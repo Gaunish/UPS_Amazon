@@ -41,14 +41,12 @@ public class ADeparser implements Runnable{
     private synchronized void deparse(AUCommand.Builder resp){
         if(resp.getPickupRequestCount() > 0){
             for(AURequestPickup pickup : resp.getPickupRequestList()){
-                System.out.println("Recieved package");
                 //deparse pickup
                 if(deparser.checkSeqNum(pickup.getSeqnum(), ackList, recvSeq)){
                     continue;
                 }
                 try{
                     exec.execute(pickup);
-                    System.out.println("Execute package");
                 }
                 catch(Exception e){}
             }
@@ -66,7 +64,7 @@ public class ADeparser implements Runnable{
                 catch(Exception e){}
             }
         }
-
+        /*
         if(resp.getErrorCount() > 0){
             for(Err err : resp.getErrorList()){
                 //deparse error
@@ -80,7 +78,7 @@ public class ADeparser implements Runnable{
     
             }
         }
-
+        */
         if(resp.getAcksCount() > 0){
             for(long ack : resp.getAcksList()){
                 //deparse acks

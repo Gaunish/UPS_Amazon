@@ -30,3 +30,15 @@ class Product(models.Model):
     class Meta:
         managed = False
         db_table = 'product'
+
+
+class Truck(models.Model):
+    truck_id = models.AutoField(primary_key=True)
+    whid = models.IntegerField()
+    status = models.CharField(max_length=25)
+    x = models.IntegerField()
+    y = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'truck'
