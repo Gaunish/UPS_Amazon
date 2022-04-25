@@ -56,7 +56,7 @@ border: 1px solid#777;
         left: 50%;
     }
 </style>
-    {%if package.status == 'PICKUP' or package.status != 'LOADING'%}
+    {%if package.status == 'PICKUP' or package.status == 'LOADING'%}
     <h4>Change Delivery Location</h4>
         <form action="" method="post">
           {% csrf_token %}
