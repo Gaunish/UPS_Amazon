@@ -1,8 +1,8 @@
 # UPS_Amazon
 
-* **Welcome to our UPS Code**
+**Welcome to our UPS Code**
+### Contributors: Gaunish garg (gg147), Ning Ding (nd157)
 
-* **Contributors: Gaunish garg (gg147), Ning Ding (nd157)**
 
 * **The project involves creation of asynchronous, event-based multi-threaded UPS server using Java, Gradle, deployed via docker. It communicates with other team's Amazon server, web simulation server**
 
